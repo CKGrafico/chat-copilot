@@ -28,3 +28,27 @@
 
 **Staged, awaiting commit approval from user.**
 
+---
+
+## 2026-04-01 — PR #42 Fix: Squad Framework Skeleton
+
+**Completed:** Fixed three blocking issues in PR #42 (authored by Linus, reviewed by Reuben).
+
+**Context:**
+Linus was locked out per review policy. I inherited the branch and rebased onto main to pick up PR #40 and #41 shared types changes.
+
+**Issues fixed:**
+1. **Profile type import:** After rebase, `src/shared/types/index.ts` now exports Profile correctly. Resolved merge conflict by accepting main's comment style. Import path `'../../shared/types'` works.
+2. **package.json self-reference:** Removed accidental `"chat-copilot": "file:"` entry (pnpm artifact).
+3. **pnpm-lock.yaml:** Deleted via `git rm pnpm-lock.yaml`. Project uses npm (package-lock.json).
+
+**Verification:**
+- TypeScript compiles cleanly: `node .\node_modules\typescript\bin\tsc --noEmit` (0 errors)
+- Tests pass: vitest run (3/3 passing)
+- Workaround: npm install broken in environment; used direct node invocation
+
+**Key learning:**
+When rebasing branches that reference shared types, merge conflicts in re-export comments are expected and trivial — just accept main's version. The import machinery matters, not the comment style.
+
+**Staged, awaiting commit approval and force-push.**
+
