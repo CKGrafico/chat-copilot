@@ -23,7 +23,17 @@
 
 ## Learnings
 
-*(appended as reviews are completed)*
+### 2026-04-01 — First PR Review Cycle Complete
+
+**Context:** Initial review of PR #39 (M1 Scaffold). Enforced modular guardrail on cross-feature imports.
+
+**Finding:** Reply feature imported `Transcription` and `TranscriptionStatus` types directly from transcription feature, violating `.plain-guardrails/modular.md`.
+
+**Action:** Posted CHANGES REQUESTED on GitHub. Locked original author (Rusty) from fix. Delegated to Linus for correction.
+
+**Outcome:** Modular boundary enforced. Set precedent: cross-feature communication (including types) routes exclusively through `src/shared/`. First rejection cycle established pattern for future reviews.
+
+**Status:** Re-review pending after Linus's shared type extraction fix applied.
 
 ## Session Log
 

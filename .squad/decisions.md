@@ -312,3 +312,52 @@ src/main.tsx              ✅ updated — mounts <Providers /> instead of <App /
 
 - **ffmpeg.wasm COOP/COEP headers:** Vite config needs `Cross-Origin-Opener-Policy` + `Cross-Origin-Embedder-Policy` headers for SharedArrayBuffer support (flagged to Basher/Linus)
 - **ESLint cross-feature import rules:** Suggest adding `eslint-plugin-import` boundary rules when team scales feature work
+
+---
+
+## 2026-04-01: PR #39 Review — Modular Violation Blocked — MERGED from decisions/inbox/reuben-pr39-review.md
+
+**Date:** 2026-04-01  
+**Reviewer:** Reuben (PR Reviewer)  
+**PR:** #39 — [M1] Scaffold Vite + React + TypeScript  
+**Author:** Rusty  
+**Status:** ❌ Changes Requested
+
+### Finding
+`src/features/reply/replyEngine.ts` and `src/features/reply/promptBuilder.ts` import `Transcription` type from `../transcription/types.ts`, violating `.plain-guardrails/modular.md`:
+> "No cross-feature imports. Cross-feature communication routes through `src/shared/` only."
+
+### Required Fix
+1. Create `src/shared/types.ts` (new shared types layer)
+2. Extract `Transcription` and `TranscriptionStatus` to shared
+3. Update reply to import from shared, not transcription
+
+### Team Precedent
+**Cross-feature type imports are blocked, even for type-only imports.** The shared layer exists for exactly this purpose.
+
+### Resolution
+Rusty locked from fix (original author). Delegated to Linus. Re-review pending after fix applied.
+
+---
+
+## 2026-04-01: Linus — Shared Type Extraction Fix (PR #39) — MERGED from decisions/inbox/linus-shared-types.md
+
+**Date:** 2026-04-01 18:44:13Z  
+**Agent:** Linus (AI Pipeline Dev)  
+**Issue:** PR #39 modular violation  
+**Status:** ✅ Fixed & Staged
+
+### Action Taken
+1. Created `src/shared/types.ts` with `Transcription` and `TranscriptionStatus`
+2. Updated `src/features/transcription/types.ts` to re-export from shared (backward compatibility)
+3. Updated `src/features/reply/replyEngine.ts` to import from shared
+4. Updated `src/features/reply/promptBuilder.ts` to import from shared
+
+### Files Staged
+- `src/shared/types.ts` (new)
+- `src/features/transcription/types.ts` (modified)
+- `src/features/reply/replyEngine.ts` (modified)
+- `src/features/reply/promptBuilder.ts` (modified)
+
+### Pattern Established
+**Shared Type Extraction:** When multiple features need the same type, extract to `src/shared/types.ts`. Feature-specific types live in feature folders; cross-feature types live in shared. Scalable for future multi-feature dependencies.
