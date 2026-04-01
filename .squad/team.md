@@ -21,6 +21,11 @@
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |
 
+## Issue Source
+- **Repository:** CKGrafico/chat-copilot
+- **Connected:** 2026-04-01
+- **Filters:** All open issues
+
 ## Project Context
 
 - **Project:** A local-first PWA that transcribes WhatsApp audio and generates reply suggestion
