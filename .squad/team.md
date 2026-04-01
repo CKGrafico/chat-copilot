@@ -18,6 +18,7 @@
 | Basher | Systems Dev | `.squad/agents/basher/charter.md` | ✅ Active |
 | Livingston | Storage & Config | `.squad/agents/livingston/charter.md` | ✅ Active |
 | Saul | Issue Writer | `.squad/agents/saul/charter.md` | ✅ Active |
+| Reuben | PR Reviewer | `.squad/agents/reuben/charter.md` | ✅ Active |
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |
 
