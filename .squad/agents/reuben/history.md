@@ -24,3 +24,18 @@
 ## Learnings
 
 *(appended as reviews are completed)*
+
+## Session Log
+
+### 2026-01-04 — Guardrails Established
+
+Created `.plain-guardrails/` with 7 review criteria files:
+- `error-handling.md` — async error coverage, typed catches, recovery paths for ffmpeg.wasm and Transformers.js
+- `logging.md` — no PII in logs, structured format, no console.log in production paths
+- `modular.md` — feature-folder boundaries, no cross-feature imports, service files must not import React
+- `conventions.md` — strict TypeScript, file naming, named exports, no magic strings, branch naming
+- `rtk.md` — RTK is a CLI proxy only, never imported in application code
+- `ddd.md` — bounded contexts, ubiquitous language, domain type ownership, Squad capability mapping
+- `architecture.md` — feature-folder law, lazy-load boundaries, audio pipeline order, no network calls in components
+
+Charter updated with `## Guardrails` section linking to `.plain-guardrails/` as mandatory pre-review reading.
