@@ -1,0 +1,36 @@
+{
+  "name": "Chat Copilot",
+  "short_name": "Chat Copilot",
+  "description": "Transcribe WhatsApp audio and get reply suggestions — entirely offline.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1a1a2e",
+  "background_color": "#1a1a2e",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "audio",
+          "accept": ["audio/*", ".opus", ".ogg", ".m4a", ".mp3", ".mp4", ".wav", ".webm"]
+        }
+      ]
+    }
+  }
+}
