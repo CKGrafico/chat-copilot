@@ -1,12 +1,2 @@
-// TODO: Shared types for the transcription feature.
-
-export type TranscriptionStatus = 'idle' | 'loading-model' | 'processing' | 'done' | 'error';
-
-export type Transcription = {
-  id: string;
-  audioItemId: string;
-  text: string;
-  language?: string;
-  createdAt: Date;
-  status: TranscriptionStatus;
-};
+// Re-export shared types for backward compatibility within the transcription feature.
+export type { TranscriptionStatus, Transcription } from '../../shared/types';
