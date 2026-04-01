@@ -162,3 +162,24 @@ Created a complete, prioritized backlog of **43 GitHub issues** grouped into **7
 **By:** Quique (via Saul)  
 **What:** Backlog pushed to CKGrafico/chat-copilot — 38 issues created across 8 milestones + stretch goals. Labels and milestones created.  
 **Why:** User confirmed repo and requested push.
+
+---
+
+## 2026-04-01: Commit Approval Required
+
+**Date:** 2026-04-01T15:50:00Z  
+**By:** CKGrafico (via Copilot)  
+**Directive:** User directive — commit approval required
+
+### Decision
+**Agents MUST ask for explicit user approval before committing anything to git. No autonomous commits without a human checkpoint.**
+
+### Why
+User request based on real-world experience — autonomous agents committing too fast to catch and stop. Privacy and safety guardrail.
+
+### Policy
+- NEVER run `git commit` autonomously
+- Always stage changes with `git add` and then STOP
+- Present a summary of staged changes to the user
+- Wait for explicit approval before committing
+- **This applies without exception to all agents, including Scribe**
