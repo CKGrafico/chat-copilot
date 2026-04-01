@@ -183,3 +183,132 @@ User request based on real-world experience — autonomous agents committing too
 - Present a summary of staged changes to the user
 - Wait for explicit approval before committing
 - **This applies without exception to all agents, including Scribe**
+
+---
+
+## 2026-04-01: RTK (Rust Token Killer) Setup — MERGED from decisions/inbox/basher-rtk-setup.md
+
+**Date:** 2025-07-10  
+**Author:** Basher (Systems Dev)  
+**Status:** ✅ Operational
+
+### Summary
+RTK 0.34.1 already installed and configured. Running `rtk init -g` configured it for GitHub Copilot/Claude via `--claude-md` mode (Unix hooks not available on Windows).
+
+### How Agents Use RTK
+All agents prefix commands with `rtk` to compress output before it reaches the LLM:
+```powershell
+rtk git status
+rtk npm run build
+rtk grep -r "pattern" src/
+```
+
+### Key Stats
+- **Binary location:** `C:\Projects\_clis\rtk.exe`
+- **Config injected into:** `C:\Users\quique.fernandez\.claude\CLAUDE.md`
+- **Token savings:** 94.5% overall on 4 recorded commands; `rtk vitest run` saved 99.8% (3.0K tokens)
+
+### Commands
+| Command | Purpose |
+|---|---|
+| `rtk <cmd>` | Run any CLI command with compression |
+| `rtk gain` | Show token savings stats |
+| `rtk --version` | Verify RTK is available |
+
+---
+
+## 2026-04-01: Triage Decision: Issue #1 — M1 Scaffold Vite + React + TypeScript — MERGED from decisions/inbox/danny-triage-issue1.md
+
+**Date:** 2025-01-09  
+**Triaged By:** Danny (Lead/Architect)  
+**Assigned To:** squad:rusty  
+**Status:** ✅ Ready for work → ✅ COMPLETED
+
+### Issue Summary
+Scaffold Vite + React + TypeScript project with feature-folder architecture. P0 deliverable that establishes foundation all other features depend on.
+
+### Routing Decision: squad:rusty ✓
+- **Primary:** Frontend foundational work (scaffolding, tooling, architecture)
+- **Scope:** Feature-folder structure, strict TS, ESLint from day 1
+- **Criticality:** P0 — blocks all downstream feature work
+- **Architectural Impact:** Foundation structure (read-once, maintain-forever); frontend lead owns vision
+
+### Architecture Trade-offs Accepted
+- **Feature-folder structure:** Requires discipline to avoid circular deps (mitigated: ESLint boundary rules in future)
+- **Strict TypeScript + ESLint from Day 1:** Slower initial velocity, but correctness > speed for foundational code
+
+### Acceptance Criteria
+- ✅ npm create vite with React + TypeScript
+- ✅ Feature folders: `src/features/{share,transcription,reply,profiles}`
+- ✅ TypeScript strict mode enabled
+- ✅ ESLint configured
+- ✅ Dev server runs (`npm run dev`)
+- ✅ Placeholder route renders
+
+### Result
+✅ COMPLETED — Rusty scaffolded 26 files with feature-folder architecture, React Router v7, Dexie, and @xenova/transformers. Staged on `squad/1-scaffold-vite-react-ts`, PR #39 opened. All deps already present; no additions needed.
+
+---
+
+## 2026-04-01: Rusty — Scaffold Decisions — MERGED from decisions/inbox/rusty-scaffold-decisions.md
+
+**Date:** 2026-04-01  
+**Agent:** Rusty (Frontend Dev)  
+**Issue:** #1 — M1 Scaffold Vite + React + TypeScript  
+**Status:** ✅ Locked
+
+### Architecture Created
+
+```
+src/
+  features/
+    share/
+      components/.gitkeep
+      hooks/.gitkeep
+      shareHandler.ts      ✅ stub — share target ingestion entry point
+      types.ts             ✅ stub — SharedAudioItem, ShareStatus
+    transcription/
+      components/.gitkeep
+      hooks/.gitkeep
+      whisperService.ts    ✅ stub — Whisper model loading + transcription
+      audioProcessing.ts   ✅ stub — ffmpeg.wasm pipeline
+      types.ts             ✅ stub — Transcription, TranscriptionStatus
+    reply/
+      components/.gitkeep
+      hooks/.gitkeep
+      replyEngine.ts       ✅ stub — template/LLM reply generation
+      promptBuilder.ts     ✅ stub — builds prompt/template key from context
+      types.ts             ✅ stub — ReplySession, ReplyStatus
+    profiles/
+      components/.gitkeep
+      hooks/.gitkeep
+      profileStore.ts      ✅ stub — Dexie CRUD for user profiles
+      types.ts             ✅ stub — Profile, ProfileTone
+  shared/
+    ui/.gitkeep
+    utils/.gitkeep
+    storage/.gitkeep
+  app/
+    router.tsx             ✅ stub — React Router v7 browser router
+    providers.tsx          ✅ stub — RouterProvider wrapper; ready for more providers
+
+src/App.tsx               ✅ cleaned — boilerplate removed
+src/main.tsx              ✅ updated — mounts <Providers /> instead of <App />
+```
+
+### Key Decisions Locked
+
+1. **`src/app/` for router + providers** — Keeps root-level orchestration separate from feature code
+2. **Providers.tsx as composition root** — All future React context providers stack here
+3. **Stubs throw `Error('Not implemented')`** — Better than silent no-ops; makes forgotten work loud
+4. **`.gitkeep` in components/ and hooks/** — Reserves folder convention without forcing index files
+
+### Dependencies (Already Installed)
+- ✅ `react-router-dom@^7`
+- ✅ `dexie@^4`
+- ✅ `@xenova/transformers@^2`
+
+### Flagged for Follow-up
+
+- **ffmpeg.wasm COOP/COEP headers:** Vite config needs `Cross-Origin-Opener-Policy` + `Cross-Origin-Embedder-Policy` headers for SharedArrayBuffer support (flagged to Basher/Linus)
+- **ESLint cross-feature import rules:** Suggest adding `eslint-plugin-import` boundary rules when team scales feature work
