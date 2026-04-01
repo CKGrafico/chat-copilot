@@ -1,4 +1,4 @@
-// Shared types used across multiple features.
+// Cross-feature transcription types. Moved from src/shared/types.ts (Issue #5).
 
 export type TranscriptionStatus = 'idle' | 'loading-model' | 'processing' | 'done' | 'error';
 
