@@ -1,0 +1,3 @@
+chore(squad): push backlog to GitHub — 38 issues, 8 milestones, 11 labels on CKGrafico/chat-copilot
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
