@@ -20,3 +20,4 @@
 | ffmpeg.wasm, audio processing | Basher | — |
 | IndexedDB, SW, manifest | Livingston | — |
 | Issue writing, user stories, backlog decomposition | Saul | Danny |
+| PR review, code correctness, approval gating | Reuben | Danny |
