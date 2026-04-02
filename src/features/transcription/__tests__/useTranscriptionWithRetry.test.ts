@@ -29,10 +29,16 @@ describe('useTranscriptionWithRetry', () => {
 
     await act(async () => {
       const promise = result.current.transcribe(new ArrayBuffer(8));
+      // loading should be true immediately
+      expect(result.current.state.loading).toBe(true);
+
       // advance timers to allow retry delay
       vi.advanceTimersByTime(1000);
       const res = await promise;
       expect(res.text).toBe('ok');
+
+      // after success loading becomes false
+      expect(result.current.state.loading).toBe(false);
     });
 
     expect(mockRun).toHaveBeenCalledTimes(2);

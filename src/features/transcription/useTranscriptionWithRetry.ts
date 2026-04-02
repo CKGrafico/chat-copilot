@@ -35,6 +35,7 @@ export function useTranscriptionWithRetry() {
         // Log the internal error for debugging (local console/storage)
         try { console.error('transcribeAudio error:', err); } catch (_) {}
 
+        // Keep loading true while retrying; update attempts and a friendly error message for the UI
         setState({ loading: true, attempts, result: null, error: userMsg });
 
         if (attempts >= maxAttempts) {
