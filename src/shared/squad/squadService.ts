@@ -12,11 +12,12 @@ type CapabilityHandler<K extends CapabilityName> = (
 ) => Promise<CapabilityMap[K]['output']>;
 
 const capabilities: { [K in CapabilityName]: CapabilityHandler<K> } = {
-  transcribeAudio: async (_input): Promise<CapabilityMap['transcribeAudio']['output']> => {
-    // TODO M4: forward audioBuffer to Whisper model running in pipeline.worker.ts
-    // Worker receives ArrayBuffer, returns { text, language, durationMs }
-    throw new Error('transcribeAudio: not implemented — see M4');
+  transcribeAudio: async (input): Promise<CapabilityMap['transcribeAudio']['output']> => {
+    // Implemented in M4: forward to transcription capability (whisperService wrapper)
+    const { transcribeCapability } = await import('./transcriptionCapability');
+    return transcribeCapability(input as any);
   },
+
 
   generateReply: async (_input): Promise<CapabilityMap['generateReply']['output']> => {
     // TODO M6: select matching templates or invoke LLM, inject profile context
