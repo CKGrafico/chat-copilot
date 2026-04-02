@@ -44,7 +44,12 @@ export async function normalizeAudio(file: File | ArrayBuffer, onProgress?: (p: 
       }
 
       loadingPromise = ffmpegInstance.load();
-      await loadingPromise;
+      try {
+        await loadingPromise;
+      } catch (err: any) {
+        clearInterval(interval);
+        throw new Error('Failed to load ffmpeg.wasm: ' + (err && err.message ? err.message : String(err)) + '. Ensure network access or use CI mocks.');
+      }
       clearInterval(interval);
       onProgress?.(1);
     } finally {
@@ -71,7 +76,11 @@ export async function normalizeAudio(file: File | ArrayBuffer, onProgress?: (p: 
 
   // Run conversion to mono WAV 16kHz
   if (typeof ffmpegInstance.run === 'function') {
-    await ffmpegInstance.run('-i', 'input', '-ac', '1', '-ar', '16000', '-f', 'wav', 'output.wav');
+    try {
+      await ffmpegInstance.run('-i', 'input', '-ac', '1', '-ar', '16000', '-f', 'wav', 'output.wav');
+    } catch (err: any) {
+      throw new Error('ffmpeg processing failed: ' + (err && err.message ? err.message : String(err)));
+    }
   } else {
     throw new Error('ffmpeg run API not available');
   }
@@ -86,11 +95,18 @@ export async function normalizeAudio(file: File | ArrayBuffer, onProgress?: (p: 
 
   if (!out) throw new Error('No output from ffmpeg');
 
-  return out.buffer.slice(out.byteOffset, out.byteOffset + out.byteLength);
+  // Return a copy of the buffer to avoid depending on underlying view offsets
+  const result = new Uint8Array(out.length);
+  result.set(out);
+  return result.buffer; 
 }
 
 // New chunkAudio implementation
 export async function chunkAudio(audioBufferOrArrayBuffer: ArrayBuffer, chunkDuration = 30, overlap = 2): Promise<ArrayBuffer[]> {
+  if (chunkDuration <= 0) throw new Error('chunkDuration must be > 0');
+  if (overlap < 0) throw new Error('overlap must be >= 0');
+  if (overlap >= chunkDuration) throw new Error('overlap must be smaller than chunkDuration');
+
   const AudioCtx: any = (globalThis as any).AudioContext || (globalThis as any).webkitAudioContext;
   if (!AudioCtx) throw new Error('AudioContext not available in this environment. Tests should mock decodeAudioData.');
 
@@ -142,8 +158,9 @@ export async function chunkAudio(audioBufferOrArrayBuffer: ArrayBuffer, chunkDur
   let startSec = 0;
   while (startSec < resampledDuration - 1e-9) {
     const endSec = Math.min(startSec + chunkDuration, resampledDuration);
-    const startSample = Math.floor(startSec * targetRate);
-    const endSample = Math.floor(endSec * targetRate);
+    const startSample = Math.floor(Math.max(0, startSec * targetRate));
+    const endSample = Math.floor(Math.min(resampledTotalSamples, endSec * targetRate));
+    if (endSample <= startSample) break;
     const segment = resampled.subarray(startSample, endSample);
     // convert to WAV 16-bit PCM
     const wav = encodeWAV(segment, targetRate);

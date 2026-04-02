@@ -8,6 +8,8 @@ export interface ProcessingProgressBarProps {
   label?: string;
   /** When true, show an indeterminate/animated state */
   indeterminate?: boolean;
+  /** Respect prefers-reduced-motion: if true, animations disabled */
+  reduceMotion?: boolean;
 }
 
 export default function ProcessingProgressBar({
@@ -20,9 +22,15 @@ export default function ProcessingProgressBar({
   const percent = Math.round(clamped * 100);
   const id = React.useId();
 
+  // Determine reduced motion preference
+  const prefersReduced = typeof window !== 'undefined' && 'matchMedia' in window
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false;
+  const disableAnimation = reduceMotion ?? prefersReduced;
+
   return (
     <div className={styles.container}>
-      <span id={`ppb-label-${id}`} className={styles.visuallyHidden}>
+      <span id={`ppb-label-${id}`} className={styles.visuallyHidden} role="status" aria-live="polite">
         {label}
       </span>
 
@@ -36,7 +44,7 @@ export default function ProcessingProgressBar({
         aria-busy={indeterminate ? true : undefined}
       >
         <div
-          className={`${styles.fill} ${indeterminate ? styles.indeterminate : ''}`}
+          className={`${styles.fill} ${indeterminate && !disableAnimation ? styles.indeterminate : ''}`}
           style={indeterminate ? undefined : { width: `${percent}%` }}
           aria-hidden="true"
         />
