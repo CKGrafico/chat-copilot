@@ -6,12 +6,12 @@
 ## Problem
 
 When running multiple Watcher instances across repos, Copilot model rate limits cause cascading failures.
-All Ralphs fail simultaneously when the preferred model (e.g., `claude-sonnet-4.6`) hits quota.
+All Watcher instances fail simultaneously when the preferred model (e.g., `claude-sonnet-4.6`) hits quota.
 
 Premium models burn quota fast:
 | Model | Multiplier | Risk |
 |-------|-----------|------|
-| `claude-sonnet-4.6` | 1x | Moderate with many Ralphs |
+| `claude-sonnet-4.6` | 1x | Moderate with many Watcher instances |
 | `claude-opus-4.6` | 10x | High |
 | `gpt-5.4` | 50x | Very high |
 | `gpt-5.4-mini` | **0x** | **Free — unlimited** |
@@ -268,7 +268,7 @@ while ($true) {
 
     try {
         # Your existing Watcher logic here, but pass $model
-        $response = Invoke-RalphCycle -Model $model
+        $response = Invoke-WatcherCycle -Model $model
 
         # Success path
         Update-CircuitBreakerOnSuccess
