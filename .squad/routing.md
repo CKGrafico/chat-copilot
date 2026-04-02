@@ -14,10 +14,10 @@
 
 | Work Type | Primary | Secondary |
 |-----------|---------|----------|
-| Architecture, decisions, review | Danny | — |
-| React, PWA, share target | Rusty | — |
-| Transformers.js, Squad, inference | Linus | — |
-| ffmpeg.wasm, audio processing | Basher | — |
-| IndexedDB, SW, manifest | Livingston | — |
-| Issue writing, user stories, backlog decomposition | Saul | Danny |
-| PR review, code correctness, approval gating | Reuben | Danny |
+| Architecture, decisions, review | Lead | — |
+| React, PWA, share target | Artist | — |
+| Transformers.js, Squad, inference | Asimov | — |
+| ffmpeg.wasm, audio processing | Beats | — |
+| IndexedDB, SW, manifest | Vault | — |
+| Issue writing, user stories, backlog decomposition | Planner | Lead |
+| PR review, code correctness, approval gating | Reviewer | Lead |

@@ -4,14 +4,14 @@
 
 **Date:** 2024  
 **Requester:** Quique Fdez Guerra  
-**Decision Owner:** Danny (Lead/Architect)  
+**Decision Owner:** Lead (Lead/Architect)  
 **Status:** Proposed
 
 ### Question
 How should we (squad) manage our backlog?
 
 ### Decision
-**Use GitHub Issues as source of truth + Ralph for intelligent triage & routing.**
+**Use GitHub Issues as source of truth + Watcher for intelligent triage & routing.**
 
 #### Why GitHub Issues
 - **Single source of truth:** Code, PRs, and issues live in the same place—no context switching
@@ -24,15 +24,15 @@ How should we (squad) manage our backlog?
 1. **Create** (anyone)
    - Title: Problem or feature (be specific: "WhatsApp audio parsing fails on 32kHz")
    - Body: Context, acceptance criteria, why it matters
-   - Label: `backlog` (Ralph routes it to inbox)
+   - Label: `backlog` (Watcher routes it to inbox)
 
-2. **Triage** (Danny or Ralph auto-trigger)
+2. **Triage** (Lead or Watcher auto-trigger)
    - Assign domain label: `frontend`, `ai`, `systems`, `storage`, `infra`
    - Set priority: `p0-critical` (blocks ship), `p1-high` (sprint), `p2-normal` (backlog)
    - Link related issues with GitHub's references
 
-3. **Assign** (Ralph + manual override)
-   - Ralph routes to owner based on label (Rusty → `frontend`, Linus → `ai`, etc.)
+3. **Assign** (Watcher + manual override)
+   - Watcher routes to owner based on label (Artist → `frontend`, Asimov → `ai`, etc.)
    - Owner can self-assign or request explicit assignment
    - Team can see ownership in issue sidebar
 
@@ -45,8 +45,8 @@ How should we (squad) manage our backlog?
    - Link PR that resolves it: `fixes #123` auto-closes on merge
    - Or manually close with comment on why it's done/won't-fix
 
-#### Ralph's Role
-Ralph monitors and **amplifies signal:**
+#### Watcher's Role
+Watcher monitors and **amplifies signal:**
 - **Inbox sweep:** Weekly scan for untracked work (PRs without issues, offline notes)
 - **Auto-route:** Label + assign to domain expert (no manual config needed)
 - **Blocker alerts:** Notify team if issue has `blocked` tag + dependency unmet
@@ -55,14 +55,14 @@ Ralph monitors and **amplifies signal:**
 
 #### Labels (Minimal Set)
 - **Status:** `backlog` (new), `in-progress`, `reviewing`, `done` (before close)
-- **Domain:** `frontend`, `ai`, `systems`, `storage`, `infra` (route to Ralph)
+- **Domain:** `frontend`, `ai`, `systems`, `storage`, `infra` (route to Watcher)
 - **Priority:** `p0-critical`, `p1-high`, `p2-normal`
 - **Type:** `feature`, `bug`, `refactor`, `tech-debt`, `docs`
 - **Blocker:** `blocked`, `blocked-by:123`
 
 #### Process Rules
 - **Small team = lightweight.** We don't track sprints yet (too early). Prioritization is `p0` vs. `p1` vs. backlog.
-- **Ralph doesn't decide priority.** Only labels/routing. Danny trages priority.
+- **Watcher doesn't decide priority.** Only labels/routing. Lead trages priority.
 - **Async-friendly:** Slack pings on new `p0` issues; weekly sync on `p1` decisions.
 - **No process debt:** If 2+ people complain a label/rule is noise, we kill it.
 
@@ -71,22 +71,22 @@ Ralph monitors and **amplifies signal:**
 | Choice | Benefit | Cost |
 |--------|---------|------|
 | GitHub Issues (not Jira/Linear) | Single source of truth + code integration | No burndown charts or gantt (fine for now) |
-| Auto-route via Ralph | No manual assignment overhead | Opinionated; must override sometimes |
+| Auto-route via Watcher | No manual assignment overhead | Opinionated; must override sometimes |
 | Simple labels | Fast to grok, low config | Doesn't scale past ~50 items (acceptable) |
-| No sprints yet | Less ceremony, focus on work | Risk of scope creep (mitigate: Danny triages weekly) |
+| No sprints yet | Less ceremony, focus on work | Risk of scope creep (mitigate: Lead triages weekly) |
 
 #### Next Steps
 1. Set up label templates in GitHub repo settings
-2. Configure Ralph routing rules (domain → owner mapping)
+2. Configure Watcher routing rules (domain → owner mapping)
 3. Post this in squad Slack + README
-4. First issue: Quique creates test issue, Ralph routes it, Rusty picks it up
+4. First issue: Quique creates test issue, Watcher routes it, Artist picks it up
 
 ---
 
 ## 2026-04-01: Initial Backlog Created for Chat Copilot MVP
 
 **Date:** 2026-04-01  
-**Decider:** Saul (Issue Writer / Product Analyst)  
+**Decider:** Planner (Issue Writer / Product Analyst)  
 **Status:** ✅ Completed
 
 ### Context
@@ -119,10 +119,10 @@ Created a complete, prioritized backlog of **43 GitHub issues** grouped into **7
 - **P2-Normal:** 17 issues (polish + stretch)
 
 **Routing:**
-- `frontend` → Rusty (17 issues)
-- `ai` → Linus (10 issues)
-- `systems` → Basher (4 issues)
-- `storage` → Livingston (12 issues)
+- `frontend` → Artist (17 issues)
+- `ai` → Asimov (10 issues)
+- `systems` → Beats (4 issues)
+- `storage` → Vault (12 issues)
 
 ### Rationale
 
@@ -135,16 +135,16 @@ Created a complete, prioritized backlog of **43 GitHub issues** grouped into **7
 ### Consequences
 
 - **✅ Team can start immediately:** P0 issues in M1 (scaffold, Squad, PWA config) are unblocked and parallelizable.
-- **✅ Clear ownership:** Labels route issues to the right agent (Rusty, Linus, Basher, Livingston).
+- **✅ Clear ownership:** Labels route issues to the right agent (Artist, Asimov, Beats, Vault).
 - **✅ Incremental delivery:** Each milestone delivers working functionality (M2 = file ingestion working, M4 = transcription working, etc.).
 - **⚠️ Scope creep risk:** 43 issues is a lot. Stick to P0/P1 for MVP; defer P2 if timeline is tight.
 - **⚠️ Mobile testing needed:** Issues like "Optimize mobile UX" assume testing on real devices (iOS Safari, Android Chrome). Plan for that.
 
 ### Artifacts
 
-- **Backlog draft:** `.squad/agents/saul/backlog-draft.md` (full 43-issue breakdown)
-- **History updated:** `.squad/agents/saul/history.md` (learnings appended)
-- **Next steps:** Ralph (team lead) can review, create GitHub issues from draft, and route to agents via labels.
+- **Backlog draft:** `.squad/agents/Planner/backlog-draft.md` (full 43-issue breakdown)
+- **History updated:** `.squad/agents/Planner/history.md` (learnings appended)
+- **Next steps:** Watcher (team lead) can review, create GitHub issues from draft, and route to agents via labels.
 
 ### Notes
 
@@ -159,7 +159,7 @@ Created a complete, prioritized backlog of **43 GitHub issues** grouped into **7
 
 ## 2026-04-01: GitHub repo connected
 
-**By:** Quique (via Saul)  
+**By:** Quique (via Planner)  
 **What:** Backlog pushed to CKGrafico/chat-copilot — 38 issues created across 8 milestones + stretch goals. Labels and milestones created.  
 **Why:** User confirmed repo and requested push.
 
@@ -186,10 +186,10 @@ User request based on real-world experience — autonomous agents committing too
 
 ---
 
-## 2026-04-01: RTK (Rust Token Killer) Setup — MERGED from decisions/inbox/basher-rtk-setup.md
+## 2026-04-01: RTK (Rust Token Killer) Setup — MERGED from decisions/inbox/Beats-rtk-setup.md
 
 **Date:** 2025-07-10  
-**Author:** Basher (Systems Dev)  
+**Author:** Beats (Systems Dev)  
 **Status:** ✅ Operational
 
 ### Summary
@@ -217,17 +217,17 @@ rtk grep -r "pattern" src/
 
 ---
 
-## 2026-04-01: Triage Decision: Issue #1 — M1 Scaffold Vite + React + TypeScript — MERGED from decisions/inbox/danny-triage-issue1.md
+## 2026-04-01: Triage Decision: Issue #1 — M1 Scaffold Vite + React + TypeScript — MERGED from decisions/inbox/Lead-triage-issue1.md
 
 **Date:** 2025-01-09  
-**Triaged By:** Danny (Lead/Architect)  
-**Assigned To:** squad:rusty  
+**Triaged By:** Lead (Lead/Architect)  
+**Assigned To:** squad:Artist  
 **Status:** ✅ Ready for work → ✅ COMPLETED
 
 ### Issue Summary
 Scaffold Vite + React + TypeScript project with feature-folder architecture. P0 deliverable that establishes foundation all other features depend on.
 
-### Routing Decision: squad:rusty ✓
+### Routing Decision: squad:Artist ✓
 - **Primary:** Frontend foundational work (scaffolding, tooling, architecture)
 - **Scope:** Feature-folder structure, strict TS, ESLint from day 1
 - **Criticality:** P0 — blocks all downstream feature work
@@ -246,14 +246,14 @@ Scaffold Vite + React + TypeScript project with feature-folder architecture. P0 
 - ✅ Placeholder route renders
 
 ### Result
-✅ COMPLETED — Rusty scaffolded 26 files with feature-folder architecture, React Router v7, Dexie, and @xenova/transformers. Staged on `squad/1-scaffold-vite-react-ts`, PR #39 opened. All deps already present; no additions needed.
+✅ COMPLETED — Artist scaffolded 26 files with feature-folder architecture, React Router v7, Dexie, and @xenova/transformers. Staged on `squad/1-scaffold-vite-react-ts`, PR #39 opened. All deps already present; no additions needed.
 
 ---
 
-## 2026-04-01: Rusty — Scaffold Decisions — MERGED from decisions/inbox/rusty-scaffold-decisions.md
+## 2026-04-01: Artist — Scaffold Decisions — MERGED from decisions/inbox/Artist-scaffold-decisions.md
 
 **Date:** 2026-04-01  
-**Agent:** Rusty (Frontend Dev)  
+**Agent:** Artist (Frontend Dev)  
 **Issue:** #1 — M1 Scaffold Vite + React + TypeScript  
 **Status:** ✅ Locked
 
@@ -310,17 +310,17 @@ src/main.tsx              ✅ updated — mounts <Providers /> instead of <App /
 
 ### Flagged for Follow-up
 
-- **ffmpeg.wasm COOP/COEP headers:** Vite config needs `Cross-Origin-Opener-Policy` + `Cross-Origin-Embedder-Policy` headers for SharedArrayBuffer support (flagged to Basher/Linus)
+- **ffmpeg.wasm COOP/COEP headers:** Vite config needs `Cross-Origin-Opener-Policy` + `Cross-Origin-Embedder-Policy` headers for SharedArrayBuffer support (flagged to Beats/Asimov)
 - **ESLint cross-feature import rules:** Suggest adding `eslint-plugin-import` boundary rules when team scales feature work
 
 ---
 
-## 2026-04-01: PR #39 Review — Modular Violation Blocked — MERGED from decisions/inbox/reuben-pr39-review.md
+## 2026-04-01: PR #39 Review — Modular Violation Blocked — MERGED from decisions/inbox/Reviewer-pr39-review.md
 
 **Date:** 2026-04-01  
-**Reviewer:** Reuben (PR Reviewer)  
+**Reviewer:** Reviewer (PR Reviewer)  
 **PR:** #39 — [M1] Scaffold Vite + React + TypeScript  
-**Author:** Rusty  
+**Author:** Artist  
 **Status:** ❌ Changes Requested
 
 ### Finding
@@ -336,14 +336,14 @@ src/main.tsx              ✅ updated — mounts <Providers /> instead of <App /
 **Cross-feature type imports are blocked, even for type-only imports.** The shared layer exists for exactly this purpose.
 
 ### Resolution
-Rusty locked from fix (original author). Delegated to Linus. Re-review pending after fix applied.
+Artist locked from fix (original author). Delegated to Asimov. Re-review pending after fix applied.
 
 ---
 
-## 2026-04-01: Linus — Shared Type Extraction Fix (PR #39) — MERGED from decisions/inbox/linus-shared-types.md
+## 2026-04-01: Asimov — Shared Type Extraction Fix (PR #39) — MERGED from decisions/inbox/Asimov-shared-types.md
 
 **Date:** 2026-04-01 18:44:13Z  
-**Agent:** Linus (AI Pipeline Dev)  
+**Agent:** Asimov (AI Pipeline Dev)  
 **Issue:** PR #39 modular violation  
 **Status:** ✅ Fixed & Staged
 

@@ -1,4 +1,4 @@
-# Rusty — History
+# Artist — History
 
 ## Core Context
 
@@ -23,7 +23,7 @@
 - React Router v7, Dexie, and @xenova/transformers were already installed — no new deps needed
 
 **Watched for:**
-- ffmpeg.wasm requires COOP/COEP headers in Vite config (SharedArrayBuffer). Flagged to Basher.
+- ffmpeg.wasm requires COOP/COEP headers in Vite config (SharedArrayBuffer). Flagged to Beats.
 - ESLint import boundary rules (cross-feature imports) should be added before feature work starts in earnest.
 
 **Staged, awaiting commit approval from user.**
@@ -32,10 +32,10 @@
 
 ## 2026-04-01 — PR #42 Fix: Squad Framework Skeleton
 
-**Completed:** Fixed three blocking issues in PR #42 (authored by Linus, reviewed by Reuben).
+**Completed:** Fixed three blocking issues in PR #42 (authored by Asimov, reviewed by Reviewer).
 
 **Context:**
-Linus was locked out per review policy. I inherited the branch and rebased onto main to pick up PR #40 and #41 shared types changes.
+Asimov was locked out per review policy. I inherited the branch and rebased onto main to pick up PR #40 and #41 shared types changes.
 
 **Issues fixed:**
 1. **Profile type import:** After rebase, `src/shared/types/index.ts` now exports Profile correctly. Resolved merge conflict by accepting main's comment style. Import path `'../../shared/types'` works.

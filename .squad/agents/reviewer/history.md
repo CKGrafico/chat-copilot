@@ -1,4 +1,4 @@
-# Reuben — History
+# Reviewer — History
 
 ## Project Context
 
@@ -11,7 +11,7 @@
 **Repo:** CKGrafico/chat-copilot
 **Requested by:** CKGrafico
 
-**Team:** Danny (Lead), Rusty (Frontend), Linus (AI Pipeline), Basher (Systems), Livingston (Storage), Saul (Issue Writer), Reuben (PR Reviewer), Scribe (Logger), Ralph (Monitor)
+**Team:** Lead (Lead), Artist (Frontend), Asimov (AI Pipeline), Beats (Systems), Vault (Storage), Planner (Issue Writer), Reviewer (PR Reviewer), Scribe (Logger), Watcher (Monitor)
 
 ## Key Decisions to Enforce in Reviews
 
@@ -29,17 +29,17 @@
 
 **Finding:** Reply feature imported `Transcription` and `TranscriptionStatus` types directly from transcription feature, violating `.plain-guardrails/modular.md`.
 
-**Action:** Posted CHANGES REQUESTED on GitHub. Locked original author (Rusty) from fix. Delegated to Linus for correction.
+**Action:** Posted CHANGES REQUESTED on GitHub. Locked original author (Artist) from fix. Delegated to Asimov for correction.
 
 **Outcome:** Modular boundary enforced. Set precedent: cross-feature communication (including types) routes exclusively through `src/shared/`. First rejection cycle established pattern for future reviews.
 
-**Status:** Re-review pending after Linus's shared type extraction fix applied.
+**Status:** Re-review pending after Asimov's shared type extraction fix applied.
 
 ## Session Log
 
 ### 2026-04-02T06:58:00Z — PR #43 review — failed to post
 
-Attempted to post a review to PR #43 but the MCP tool returned an error: "MCP server 'github-mcp-server': unknown method: create_review". Created a local note and requested that @linus be assigned to finish the review. See .squad/agents/reuben/note_assign_linus.txt
+Attempted to post a review to PR #43 but the MCP tool returned an error: "MCP server 'github-mcp-server': unknown method: create_review". Created a local note and requested that @Asimov be assigned to finish the review. See .squad/agents/Reviewer/note_assign_Asimov.txt
 
 
 

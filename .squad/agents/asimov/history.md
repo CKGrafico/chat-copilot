@@ -1,4 +1,4 @@
-# Linus — History
+# Asimov — History
 
 ## Core Context
 
@@ -15,3 +15,4 @@
 **Pattern:** When multiple features need the same type, extract to `src/shared/types.ts`. Feature-specific types stay in feature folders; cross-feature types live in shared. Applied to `Transcription` and `TranscriptionStatus`.
 
 **Outcome:** Modular violation fixed, scalable pattern established for future multi-feature dependencies. Set precedent: even type-only imports must route through shared layer.
+- 2026-04-02T09:31:20Z: Posted PR review on #43; staged changes; ran tests (see test output).
