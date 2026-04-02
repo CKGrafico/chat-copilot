@@ -1,4 +1,4 @@
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react-hooks';
 import * as squad from '../../shared/squad/squadService';
 import { useTranscriptionWithRetry } from '../useTranscriptionWithRetry';
@@ -6,6 +6,16 @@ import { useTranscriptionWithRetry } from '../useTranscriptionWithRetry';
 vi.mock('../../shared/squad/squadService');
 
 describe('useTranscriptionWithRetry', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.useRealTimers();
+    vi.resetAllMocks();
+  });
+
   it('retries on failure and succeeds', async () => {
     const mockRun = (squad.squadService.run as any);
     let calls = 0;
@@ -18,11 +28,15 @@ describe('useTranscriptionWithRetry', () => {
     const { result } = renderHook(() => useTranscriptionWithRetry());
 
     await act(async () => {
-      const res = await result.current.transcribe(new ArrayBuffer(8));
+      const promise = result.current.transcribe(new ArrayBuffer(8));
+      // advance timers to allow retry delay
+      vi.advanceTimersByTime(1000);
+      const res = await promise;
       expect(res.text).toBe('ok');
     });
 
-    expect(calls).toBe(2);
+    expect(mockRun).toHaveBeenCalledTimes(2);
+    expect(result.current.state.attempts).toBe(2);
   });
 
   it('fails after max attempts', async () => {
@@ -32,7 +46,13 @@ describe('useTranscriptionWithRetry', () => {
     const { result } = renderHook(() => useTranscriptionWithRetry());
 
     await act(async () => {
-      await expect(result.current.transcribe(new ArrayBuffer(8))).rejects.toThrow();
+      const p = result.current.transcribe(new ArrayBuffer(8));
+      // advance through all retry delays (3 attempts => 2 delays)
+      vi.advanceTimersByTime(3000);
+      await expect(p).rejects.toThrow();
     });
+
+    expect(mockRun).toHaveBeenCalledTimes(3);
+    expect(result.current.state.attempts).toBe(3);
   });
 });
