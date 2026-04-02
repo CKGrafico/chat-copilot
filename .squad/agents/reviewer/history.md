@@ -40,6 +40,7 @@
 ### 2026-04-02T06:58:00Z — PR #43 review — failed to post
 
 Attempted to post a review to PR #43 but the MCP tool returned an error: "MCP server 'github-mcp-server': unknown method: create_review". Created a local note and requested that @Asimov be assigned to finish the review. See .squad/agents/Reviewer/note_assign_Asimov.txt
+Attempted to post a review to PR #43 but the MCP tool returned an error: "MCP server 'github-mcp-server': unknown method: create_review". Created a local note and requested that @linus be assigned to finish the review. See .squad/agents/reuben/note_assign_linus.txt
 
 
 
