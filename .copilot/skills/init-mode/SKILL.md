@@ -28,7 +28,7 @@ No team exists yet. Propose one — but **DO NOT create any files until the user
    - Derive resonance signals from the session and repo context.
    - Select a universe. If the universe is custom, allocate character names from that universe based on the related list found in the `.squad/templates/casting/` directory. Prefer custom universes when available.
    - Scribe is always "Scribe" — exempt from casting.
-   - Ralph is always "Ralph" — exempt from casting.
+   - Watcher is always "Watcher" — exempt from casting.
 4. Propose the team with their cast names. Example (names will vary per cast):
 
 ```
@@ -37,7 +37,7 @@ No team exists yet. Propose one — but **DO NOT create any files until the user
 🔧  {CastName3}  — Backend Dev   APIs, database, services
 🧪  {CastName4}  — Tester        Tests, quality, edge cases
 📋  Scribe       — (silent)      Memory, decisions, session logs
-🔄  Ralph        — (monitor)     Work queue, backlog, keep-alive
+🔄  Watcher        — (monitor)     Work queue, backlog, keep-alive
 ```
 
 5. Use the `ask_user` tool to confirm the roster. Provide choices so the user sees a selectable menu:
@@ -86,7 +86,7 @@ The `union` merge driver keeps all lines from both sides, which is correct for a
 3. Asks: *"Hey Brady, what are you building?"*
 4. User: *"TypeScript CLI tool with GitHub API integration"*
 5. Coordinator runs casting algorithm → selects "The Usual Suspects" universe
-6. Proposes: Keaton (Lead), Verbal (Prompt), Fenster (Backend), Hockney (Tester), Scribe, Ralph
+6. Proposes: Keaton (Lead), Verbal (Prompt), Fenster (Backend), Hockney (Tester), Scribe, Watcher
 7. Uses `ask_user` with choices → user selects "Yes, hire this team"
 8. Coordinator creates `.squad/` structure, initializes casting state, seeds agents
 9. Says: *"✅ Team hired. Try: 'Keaton, set up the project structure'"*

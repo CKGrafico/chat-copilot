@@ -1,11 +1,11 @@
-# Ralph Circuit Breaker — Model Rate Limit Fallback
+# Watcher Circuit Breaker — Model Rate Limit Fallback
 
 > Classic circuit breaker pattern (Hystrix / Polly / Resilience4j) applied to Copilot model selection.
-> When the preferred model hits rate limits, Ralph automatically degrades to free-tier models, then self-heals.
+> When the preferred model hits rate limits, Watcher automatically degrades to free-tier models, then self-heals.
 
 ## Problem
 
-When running multiple Ralph instances across repos, Copilot model rate limits cause cascading failures.
+When running multiple Watcher instances across repos, Copilot model rate limits cause cascading failures.
 All Ralphs fail simultaneously when the preferred model (e.g., `claude-sonnet-4.6`) hits quota.
 
 Premium models burn quota fast:
@@ -52,7 +52,7 @@ Premium models burn quota fast:
 - If 2 consecutive successes → transition to CLOSED
 - If rate limit error → back to OPEN, reset cooldown
 
-## State File: `.squad/ralph-circuit-breaker.json`
+## State File: `.squad/Watcher-circuit-breaker.json`
 
 ```json
 {
@@ -75,13 +75,13 @@ Premium models burn quota fast:
 
 ## PowerShell Functions
 
-Paste these into your `ralph-watch.ps1` or source them from a shared module.
+Paste these into your `Watcher-watch.ps1` or source them from a shared module.
 
 ### `Get-CircuitBreakerState`
 
 ```powershell
 function Get-CircuitBreakerState {
-    param([string]$StateFile = ".squad/ralph-circuit-breaker.json")
+    param([string]$StateFile = ".squad/Watcher-circuit-breaker.json")
 
     if (-not (Test-Path $StateFile)) {
         $default = @{
@@ -114,7 +114,7 @@ function Get-CircuitBreakerState {
 function Save-CircuitBreakerState {
     param(
         [object]$State,
-        [string]$StateFile = ".squad/ralph-circuit-breaker.json"
+        [string]$StateFile = ".squad/Watcher-circuit-breaker.json"
     )
 
     $State | ConvertTo-Json -Depth 3 | Set-Content $StateFile
@@ -123,11 +123,11 @@ function Save-CircuitBreakerState {
 
 ### `Get-CurrentModel`
 
-Returns the model Ralph should use right now, based on circuit state.
+Returns the model Watcher should use right now, based on circuit state.
 
 ```powershell
 function Get-CurrentModel {
-    param([string]$StateFile = ".squad/ralph-circuit-breaker.json")
+    param([string]$StateFile = ".squad/Watcher-circuit-breaker.json")
 
     $cb = Get-CircuitBreakerState -StateFile $StateFile
 
@@ -169,7 +169,7 @@ Call after every successful model response.
 
 ```powershell
 function Update-CircuitBreakerOnSuccess {
-    param([string]$StateFile = ".squad/ralph-circuit-breaker.json")
+    param([string]$StateFile = ".squad/Watcher-circuit-breaker.json")
 
     $cb = Get-CircuitBreakerState -StateFile $StateFile
     $cb.consecutiveFailures = 0
@@ -203,7 +203,7 @@ Call when a model response indicates rate limiting (HTTP 429 or error message co
 
 ```powershell
 function Update-CircuitBreakerOnRateLimit {
-    param([string]$StateFile = ".squad/ralph-circuit-breaker.json")
+    param([string]$StateFile = ".squad/Watcher-circuit-breaker.json")
 
     $cb = Get-CircuitBreakerState -StateFile $StateFile
     $cb.consecutiveFailures++
@@ -237,9 +237,9 @@ function Update-CircuitBreakerOnRateLimit {
 }
 ```
 
-## Integration with ralph-watch.ps1
+## Integration with Watcher-watch.ps1
 
-In your Ralph polling loop, wrap the model selection:
+In your Watcher polling loop, wrap the model selection:
 
 ```powershell
 # At the top of your polling loop
@@ -260,14 +260,14 @@ if ($result -match "rate.?limit" -or $LASTEXITCODE -eq 429) {
 
 ```powershell
 # Source the circuit breaker functions
-. .squad-templates/ralph-circuit-breaker-functions.ps1
+. .squad-templates/Watcher-circuit-breaker-functions.ps1
 
 while ($true) {
     $model = Get-CurrentModel
     Write-Host "Polling with model: $model"
 
     try {
-        # Your existing Ralph logic here, but pass $model
+        # Your existing Watcher logic here, but pass $model
         $response = Invoke-RalphCycle -Model $model
 
         # Success path
@@ -289,7 +289,7 @@ while ($true) {
 
 ## Configuration
 
-Override defaults by editing `.squad/ralph-circuit-breaker.json`:
+Override defaults by editing `.squad/Watcher-circuit-breaker.json`:
 
 | Field | Default | Description |
 |-------|---------|-------------|
@@ -308,6 +308,6 @@ The state file tracks operational metrics:
 
 Query metrics with:
 ```powershell
-$cb = Get-Content .squad/ralph-circuit-breaker.json | ConvertFrom-Json
+$cb = Get-Content .squad/Watcher-circuit-breaker.json | ConvertFrom-Json
 Write-Host "Fallbacks: $($cb.metrics.totalFallbacks) | Recoveries: $($cb.metrics.totalRecoveries)"
 ```

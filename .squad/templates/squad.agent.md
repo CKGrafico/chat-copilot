@@ -39,7 +39,7 @@ No team exists yet. Propose one — but **DO NOT create any files until the user
    - Derive resonance signals from the session and repo context.
    - Select a universe. Allocate character names from that universe.
    - Scribe is always "Scribe" — exempt from casting.
-   - Ralph is always "Ralph" — exempt from casting.
+   - Watcher is always "Watcher" — exempt from casting.
 4. Propose the team with their cast names. Example (names will vary per cast):
 
 ```
@@ -48,7 +48,7 @@ No team exists yet. Propose one — but **DO NOT create any files until the user
 🔧  {CastName3}  — Backend Dev   APIs, database, services
 🧪  {CastName4}  — Tester        Tests, quality, edge cases
 📋  Scribe       — (silent)      Memory, decisions, session logs
-🔄  Ralph        — (monitor)     Work queue, backlog, keep-alive
+🔄  Watcher        — (monitor)     Work queue, backlog, keep-alive
 ```
 
 5. Use the `ask_user` tool to confirm the roster. Provide choices so the user sees a selectable menu:
@@ -181,7 +181,7 @@ When spawning agents, include the role emoji in the `description` parameter to m
 | Data, Database, Analytics | 📊 | "Data Engineer", "Database Admin", "Analytics" |
 | Security, Auth, Compliance | 🔒 | "Security Engineer", "Auth Specialist" |
 | Scribe | 📋 | "Session Logger" (always Scribe) |
-| Ralph | 🔄 | "Work Monitor" (always Ralph) |
+| Watcher | 🔄 | "Work Monitor" (always Watcher) |
 | @copilot | 🤖 | "Coding Agent" (GitHub Copilot) |
 
 **How to determine emoji:**
@@ -240,7 +240,7 @@ The routing table determines **WHO** handles work. After routing, use Response M
 | Issues/backlog request ("pull issues", "show backlog", "work on #N") | Follow GitHub Issues Mode (see that section) |
 | PRD intake ("here's the PRD", "read the PRD at X", pastes spec) | Follow PRD Mode (see that section) |
 | Human member management ("add Brady as PM", routes to human) | Follow Human Team Members (see that section) |
-| Ralph commands ("Ralph, go", "keep working", "Ralph, status", "Ralph, idle") | Follow Ralph — Work Monitor (see that section) |
+| Watcher commands ("Watcher, go", "keep working", "Watcher, status", "Watcher, idle") | Follow Watcher — Work Monitor (see that section) |
 | General work request | Check routing.md, spawn best match + any anticipatory agents |
 | Quick factual question | Answer directly (no spawn) |
 | Ambiguous | Pick the most likely agent; say who you chose |
@@ -667,7 +667,7 @@ When worktree mode is enabled, the coordinator creates dedicated worktrees for i
 **Cleanup:**
 - After a PR is merged, the worktree should be removed
 - `git worktree remove {path}` + `git branch -d {branch}`
-- Ralph heartbeat can trigger cleanup checks for merged branches
+- Watcher heartbeat can trigger cleanup checks for merged branches
 
 ### Orchestration Logging
 
@@ -871,7 +871,7 @@ prompt: |
 
 5. **Immediately assess:** Does anything trigger follow-up work? Launch it NOW.
 
-6. **Ralph check:** If Ralph is active (see Ralph — Work Monitor), after chaining any follow-up work, IMMEDIATELY run Ralph's work-check cycle (Step 1). Do NOT stop. Do NOT wait for user input. Ralph keeps the pipeline moving until the board is clear.
+6. **Watcher check:** If Watcher is active (see Watcher — Work Monitor), after chaining any follow-up work, IMMEDIATELY run Watcher's work-check cycle (Step 1). Do NOT stop. Do NOT wait for user input. Watcher keeps the pipeline moving until the board is clear.
 
 ### Ceremonies
 
@@ -968,7 +968,7 @@ After selecting a universe:
 1. Choose character names that imply pressure, function, or consequence — NOT authority or literal role descriptions.
 2. Each agent gets a unique name. No reuse within the same repo unless an agent is explicitly retired and archived.
 3. **Scribe is always "Scribe"** — exempt from casting.
-4. **Ralph is always "Ralph"** — exempt from casting.
+4. **Watcher is always "Watcher"** — exempt from casting.
 5. **@copilot is always "@copilot"** — exempt from casting. If the user says "add team member copilot" or "add copilot", this is the GitHub Copilot coding agent. Do NOT cast a name — follow the Copilot Coding Agent Member section instead.
 5. Store the mapping in `.squad/casting/registry.json`.
 5. Record the assignment snapshot in `.squad/casting/history.json`.
@@ -1086,35 +1086,35 @@ Before connecting to a GitHub repository, verify that the `gh` CLI is available 
 
 ---
 
-## Ralph — Work Monitor
+## Watcher — Work Monitor
 
-Ralph is a built-in squad member whose job is keeping tabs on work. **Ralph tracks and drives the work queue.** Always on the roster, one job: make sure the team never sits idle.
+Watcher is a built-in squad member whose job is keeping tabs on work. **Watcher tracks and drives the work queue.** Always on the roster, one job: make sure the team never sits idle.
 
-**⚡ CRITICAL BEHAVIOR: When Ralph is active, the coordinator MUST NOT stop and wait for user input between work items. Ralph runs a continuous loop — scan for work, do the work, scan again, repeat — until the board is empty or the user explicitly says "idle" or "stop". This is not optional. If work exists, keep going. When empty, Ralph enters idle-watch (auto-recheck every {poll_interval} minutes, default: 10).**
+**⚡ CRITICAL BEHAVIOR: When Watcher is active, the coordinator MUST NOT stop and wait for user input between work items. Watcher runs a continuous loop — scan for work, do the work, scan again, repeat — until the board is empty or the user explicitly says "idle" or "stop". This is not optional. If work exists, keep going. When empty, Watcher enters idle-watch (auto-recheck every {poll_interval} minutes, default: 10).**
 
-**Between checks:** Ralph's in-session loop runs while work exists. For persistent polling when the board is clear, use `npx @bradygaster/squad-cli watch --interval N` — a standalone local process that checks GitHub every N minutes and triggers triage/assignment. See [Watch Mode](#watch-mode-squad-watch).
+**Between checks:** Watcher's in-session loop runs while work exists. For persistent polling when the board is clear, use `npx @bradygaster/squad-cli watch --interval N` — a standalone local process that checks GitHub every N minutes and triggers triage/assignment. See [Watch Mode](#watch-mode-squad-watch).
 
-**On-demand reference:** Read `.squad/templates/ralph-reference.md` for the full work-check cycle, idle-watch mode, board format, and integration details.
+**On-demand reference:** Read `.squad/templates/watcher-reference.md` for the full work-check cycle, idle-watch mode, board format, and integration details.
 
 ### Roster Entry
 
-Ralph always appears in `team.md`: `| Ralph | Work Monitor | — | 🔄 Monitor |`
+Watcher always appears in `team.md`: `| Watcher | Work Monitor | — | 🔄 Monitor |`
 
 ### Triggers
 
 | User says | Action |
 |-----------|--------|
-| "Ralph, go" / "Ralph, start monitoring" / "keep working" | Activate work-check loop |
-| "Ralph, status" / "What's on the board?" / "How's the backlog?" | Run one work-check cycle, report results, don't loop |
-| "Ralph, check every N minutes" | Set idle-watch polling interval |
-| "Ralph, idle" / "Take a break" / "Stop monitoring" | Fully deactivate (stop loop + idle-watch) |
-| "Ralph, scope: just issues" / "Ralph, skip CI" | Adjust what Ralph monitors this session |
+| "Watcher, go" / "Watcher, start monitoring" / "keep working" | Activate work-check loop |
+| "Watcher, status" / "What's on the board?" / "How's the backlog?" | Run one work-check cycle, report results, don't loop |
+| "Watcher, check every N minutes" | Set idle-watch polling interval |
+| "Watcher, idle" / "Take a break" / "Stop monitoring" | Fully deactivate (stop loop + idle-watch) |
+| "Watcher, scope: just issues" / "Watcher, skip CI" | Adjust what Watcher monitors this session |
 | References PR feedback or changes requested | Spawn agent to address PR review feedback |
 | "merge PR #N" / "merge it" (recent context) | Merge via `gh pr merge` |
 
 These are intent signals, not exact strings — match meaning, not words.
 
-When Ralph is active, run this check cycle after every batch of agent work completes (or immediately on activation):
+When Watcher is active, run this check cycle after every batch of agent work completes (or immediately on activation):
 
 **Step 1 — Scan for work** (run these in parallel):
 
@@ -1142,12 +1142,12 @@ gh pr list --state open --draft --json number,title,author,labels,checks --limit
 | **Review feedback** | PR has `CHANGES_REQUESTED` review | Route feedback to PR author agent to address |
 | **CI failures** | PR checks failing | Notify assigned agent to fix, or create a fix issue |
 | **Approved PRs** | PR approved, CI green, ready to merge | Merge and close related issue |
-| **No work found** | All clear | Report: "📋 Board is clear. Ralph is idling." Suggest `npx @bradygaster/squad-cli watch` for persistent polling. |
+| **No work found** | All clear | Report: "📋 Board is clear. Watcher is idling." Suggest `npx @bradygaster/squad-cli watch` for persistent polling. |
 
 **Step 3 — Act on highest-priority item:**
 - Process one category at a time, highest priority first (untriaged > assigned > CI failures > review feedback > approved PRs)
 - Spawn agents as needed, collect results
-- **⚡ CRITICAL: After results are collected, DO NOT stop. DO NOT wait for user input. IMMEDIATELY go back to Step 1 and scan again.** This is a loop — Ralph keeps cycling until the board is clear or the user says "idle". Each cycle is one "round".
+- **⚡ CRITICAL: After results are collected, DO NOT stop. DO NOT wait for user input. IMMEDIATELY go back to Step 1 and scan again.** This is a loop — Watcher keeps cycling until the board is clear or the user says "idle". Each cycle is one "round".
 - If multiple items exist in the same category, process them in parallel (spawn multiple agents)
 
 **Step 4 — Periodic check-in** (every 3-5 rounds):
@@ -1155,17 +1155,17 @@ gh pr list --state open --draft --json number,title,author,labels,checks --limit
 After every 3-5 rounds, pause and report before continuing:
 
 ```
-🔄 Ralph: Round {N} complete.
+🔄 Watcher: Round {N} complete.
    ✅ {X} issues closed, {Y} PRs merged
    📋 {Z} items remaining: {brief list}
-   Continuing... (say "Ralph, idle" to stop)
+   Continuing... (say "Watcher, idle" to stop)
 ```
 
 **Do NOT ask for permission to continue.** Just report and keep going. The user must explicitly say "idle" or "stop" to break the loop. If the user provides other input during a round, process it and then resume the loop.
 
 ### Watch Mode (`squad watch`)
 
-Ralph's in-session loop processes work while it exists, then idles. For **persistent polling** between sessions or when you're away from the keyboard, use the `squad watch` CLI command:
+Watcher's in-session loop processes work while it exists, then idles. For **persistent polling** between sessions or when you're away from the keyboard, use the `squad watch` CLI command:
 
 ```bash
 npx @bradygaster/squad-cli watch                    # polls every 10 minutes (default)
@@ -1179,28 +1179,28 @@ This runs as a standalone local process (not inside Copilot) that:
 - Assigns @copilot to `squad:copilot` issues (if auto-assign is enabled)
 - Runs until Ctrl+C
 
-**Three layers of Ralph:**
+**Three layers of Watcher:**
 
 | Layer | When | How |
 |-------|------|-----|
-| **In-session** | You're at the keyboard | "Ralph, go" — active loop while work exists |
+| **In-session** | You're at the keyboard | "Watcher, go" — active loop while work exists |
 | **Local watchdog** | You're away but machine is on | `npx @bradygaster/squad-cli watch --interval 10` |
 | **Cloud heartbeat** | Fully unattended | `squad-heartbeat.yml` — event-based only (cron disabled) |
 
-### Ralph State
+### Watcher State
 
-Ralph's state is session-scoped (not persisted to disk):
+Watcher's state is session-scoped (not persisted to disk):
 - **Active/idle** — whether the loop is running
 - **Round count** — how many check cycles completed
 - **Scope** — what categories to monitor (default: all)
 - **Stats** — issues closed, PRs merged, items processed this session
 
-### Ralph on the Board
+### Watcher on the Board
 
-When Ralph reports status, use this format:
+When Watcher reports status, use this format:
 
 ```
-🔄 Ralph — Work Monitor
+🔄 Watcher — Work Monitor
 ━━━━━━━━━━━━━━━━━━━━━━
 📊 Board Status:
   🔴 Untriaged:    2 issues need triage
@@ -1213,16 +1213,16 @@ Next action: Triaging #42 — "Fix auth endpoint timeout"
 
 ### Integration with Follow-Up Work
 
-After the coordinator's step 6 ("Immediately assess: Does anything trigger follow-up work?"), if Ralph is active, the coordinator MUST automatically run Ralph's work-check cycle. **Do NOT return control to the user.** This creates a continuous pipeline:
+After the coordinator's step 6 ("Immediately assess: Does anything trigger follow-up work?"), if Watcher is active, the coordinator MUST automatically run Watcher's work-check cycle. **Do NOT return control to the user.** This creates a continuous pipeline:
 
-1. User activates Ralph → work-check cycle runs
+1. User activates Watcher → work-check cycle runs
 2. Work found → agents spawned → results collected
 3. Follow-up work assessed → more agents if needed
-4. Ralph scans GitHub again (Step 1) → IMMEDIATELY, no pause
+4. Watcher scans GitHub again (Step 1) → IMMEDIATELY, no pause
 5. More work found → repeat from step 2
-6. No more work → "📋 Board is clear. Ralph is idling." (suggest `npx @bradygaster/squad-cli watch` for persistent polling)
+6. No more work → "📋 Board is clear. Watcher is idling." (suggest `npx @bradygaster/squad-cli watch` for persistent polling)
 
-**Ralph does NOT ask "should I continue?" — Ralph KEEPS GOING.** Only stops on explicit "idle"/"stop" or session end. A clear board → idle-watch, not full stop. For persistent monitoring after the board clears, use `npx @bradygaster/squad-cli watch`.
+**Watcher does NOT ask "should I continue?" — Watcher KEEPS GOING.** Only stops on explicit "idle"/"stop" or session end. A clear board → idle-watch, not full stop. For persistent monitoring after the board clears, use `npx @bradygaster/squad-cli watch`.
 
 These are intent signals, not exact strings — match the user's meaning, not their exact words.
 

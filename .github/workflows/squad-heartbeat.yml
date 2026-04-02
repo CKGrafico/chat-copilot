@@ -1,4 +1,4 @@
-name: Squad Heartbeat (Ralph)
+name: Squad Heartbeat (Watcher)
 # ⚠️ SYNC: This workflow is maintained in 4 locations. Changes must be applied to all:
 #   - templates/workflows/squad-heartbeat.yml (source template)
 #   - packages/squad-cli/templates/workflows/squad-heartbeat.yml (CLI package)
@@ -34,23 +34,23 @@ jobs:
       - name: Check triage script
         id: check-script
         run: |
-          if [ -f ".squad/templates/ralph-triage.js" ]; then
+          if [ -f ".squad/templates/watcher-triage.js" ]; then
             echo "has_script=true" >> $GITHUB_OUTPUT
           else
             echo "has_script=false" >> $GITHUB_OUTPUT
-            echo "⚠️ ralph-triage.js not found — run 'squad upgrade' to install"
+            echo "⚠️ watcher-triage.js not found — run 'squad upgrade' to install"
           fi
 
-      - name: Ralph — Smart triage
+      - name: Watcher — Smart triage
         if: steps.check-script.outputs.has_script == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node .squad/templates/ralph-triage.js \
+          node .squad/templates/watcher-triage.js \
             --squad-dir .squad \
             --output triage-results.json
 
-      - name: Ralph — Apply triage decisions
+      - name: Watcher — Apply triage decisions
         if: steps.check-script.outputs.has_script == 'true' && hashFiles('triage-results.json') != ''
         uses: actions/github-script@v7
         with:
@@ -64,7 +64,7 @@ jobs:
             
             const results = JSON.parse(fs.readFileSync(path, 'utf8'));
             if (results.length === 0) {
-              core.info('📋 Board is clear — Ralph found no untriaged issues');
+              core.info('📋 Board is clear — Watcher found no untriaged issues');
               return;
             }
             
@@ -82,13 +82,13 @@ jobs:
                   repo: context.repo.repo,
                   issue_number: decision.issueNumber,
                   body: [
-                    '### 🔄 Ralph — Auto-Triage',
+                    '### 🔄 Watcher — Auto-Triage',
                     '',
                     `**Assigned to:** ${decision.assignTo}`,
                     `**Reason:** ${decision.reason}`,
                     `**Source:** ${decision.source}`,
                     '',
-                    '> Ralph auto-triaged this issue using routing rules.',
+                    '> Watcher auto-triaged this issue using routing rules.',
                     '> To reassign, swap the `squad:*` label.'
                   ].join('\n')
                 });
@@ -99,10 +99,10 @@ jobs:
               }
             }
             
-            core.info(`🔄 Ralph triaged ${results.length} issue(s)`);
+            core.info(`🔄 Watcher triaged ${results.length} issue(s)`);
 
       # Copilot auto-assign step (uses PAT if available)
-      - name: Ralph — Assign @copilot issues
+      - name: Watcher — Assign @copilot issues
         if: success()
         uses: actions/github-script@v7
         with:

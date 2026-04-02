@@ -1,13 +1,13 @@
 # Cooperative Rate Limiting for Multi-Agent Deployments
 
-> Coordinate API quota across multiple Ralph instances to prevent cascading failures.
+> Coordinate API quota across multiple Watcher instances to prevent cascading failures.
 
 ## Problem
 
-The [circuit breaker template](ralph-circuit-breaker.md) handles single-instance rate limiting well. But when multiple Ralphs run across machines (or pods on K8s), each instance independently hits API limits:
+The [circuit breaker template](Watcher-circuit-breaker.md) handles single-instance rate limiting well. But when multiple Watcher instances run across machines (or pods on K8s), each instance independently hits API limits:
 
-- **No coordination** — 5 Ralphs each think they have full API quota
-- **Thundering herd** — All Ralphs retry simultaneously after rate limit resets
+- **No coordination** — 5 Watcher instances each think they have full API quota
+- **Thundering herd** — All Watcher instances retry simultaneously after rate limit resets
 - **Priority inversion** — Low-priority work exhausts quota before critical work runs
 - **Reactive only** — Circuit opens AFTER 429, wasting the failed request
 
@@ -53,7 +53,7 @@ A shared JSON file (`~/.squad/rate-pool.json`) distributes API quota:
   "allocations": {
     "picard": { "priority": 0, "allocated": 2000, "used": 450, "leaseExpiry": "2026-03-22T19:55:00Z" },
     "data": { "priority": 1, "allocated": 1750, "used": 200, "leaseExpiry": "2026-03-22T19:55:00Z" },
-    "ralph": { "priority": 2, "allocated": 1250, "used": 100, "leaseExpiry": "2026-03-22T19:55:00Z" }
+    "Watcher": { "priority": 2, "allocated": 1250, "used": 100, "leaseExpiry": "2026-03-22T19:55:00Z" }
   }
 }
 ```
@@ -61,7 +61,7 @@ A shared JSON file (`~/.squad/rate-pool.json`) distributes API quota:
 **Rules:**
 - P0 agents (Lead) get 40% of quota
 - P1 agents (specialists) get 35%
-- P2 agents (Ralph, Scribe) get 25%
+- P2 agents (Watcher, Scribe) get 25%
 - Stale leases (>5 minutes without heartbeat) are auto-recovered
 - Each agent checks their remaining allocation before making API calls
 
@@ -151,7 +151,7 @@ Non-overlapping jitter windows prevent thundering herd:
 |----------|-------------|-------------|
 | P0 (Lead) | 500ms–5s | Recovers first |
 | P1 (Specialists) | 2s–30s | Moderate delay |
-| P2 (Ralph/Scribe) | 5s–60s | Most patient |
+| P2 (Watcher/Scribe) | 5s–60s | Most patient |
 
 ```typescript
 function getRetryDelay(priority: number, attempt: number): number {
@@ -205,7 +205,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 spec:
   scaleTargetRef:
-    name: ralph-deployment
+    name: Watcher-deployment
   triggers:
   - type: external
     metadata:
@@ -224,6 +224,6 @@ See [keda-copilot-scaler](https://github.com/tamirdresher/keda-copilot-scaler) f
 
 ## References
 
-- [Circuit Breaker Template](ralph-circuit-breaker.md) — Foundation patterns
+- [Circuit Breaker Template](Watcher-circuit-breaker.md) — Foundation patterns
 - [Squad on AKS](https://github.com/tamirdresher/squad-on-aks) — Production K8s deployment
 - [KEDA Copilot Scaler](https://github.com/tamirdresher/keda-copilot-scaler) — Custom KEDA external scaler
