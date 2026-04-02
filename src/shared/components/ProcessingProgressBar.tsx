@@ -1,0 +1,50 @@
+import React from 'react';
+import styles from './ProcessingProgressBar.module.css';
+
+export interface ProcessingProgressBarProps {
+  /** Value between 0 and 1 (ignored when indeterminate) */
+  value: number;
+  /** Visible label for assistive tech (optional) */
+  label?: string;
+  /** When true, show an indeterminate/animated state */
+  indeterminate?: boolean;
+}
+
+export default function ProcessingProgressBar({
+  value,
+  label = 'Processing',
+  indeterminate = false,
+}: ProcessingProgressBarProps) {
+  // Ensure safe value between 0 and 1
+  const clamped = Math.max(0, Math.min(1, Number(value) || 0));
+  const percent = Math.round(clamped * 100);
+  const id = React.useId();
+
+  return (
+    <div className={styles.container}>
+      <span id={`ppb-label-${id}`} className={styles.visuallyHidden}>
+        {label}
+      </span>
+
+      <div
+        className={styles.track}
+        role="progressbar"
+        aria-labelledby={`ppb-label-${id}`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={indeterminate ? undefined : percent}
+        aria-busy={indeterminate ? true : undefined}
+      >
+        <div
+          className={`${styles.fill} ${indeterminate ? styles.indeterminate : ''}`}
+          style={indeterminate ? undefined : { width: `${percent}%` }}
+          aria-hidden="true"
+        />
+      </div>
+
+      <div className={styles.meta} aria-hidden="true">
+        {indeterminate ? 'Processing…' : `${percent}%`}
+      </div>
+    </div>
+  );
+}
