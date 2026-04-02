@@ -26,7 +26,7 @@ Phase 1 is **draft-only mode**.
 - PAO scans issues and discussions, drafts responses with the humanizer skill, and presents a review table for human approval.
 - **Human review gate is mandatory** — PAO never posts autonomously.
 - Every action is logged to `.squad/comms/audit/`.
-- This workflow is triggered manually only ("PAO, check community") — no automated or Ralph-triggered activation in Phase 1.
+- This workflow is triggered manually only ("PAO, check community") — no automated or Watcher-triggered activation in Phase 1.
 
 ## Patterns
 

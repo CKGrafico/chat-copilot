@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 /**
- * Ralph Triage Script — Standalone CJS implementation
+ * Watcher Triage Script — Standalone CJS implementation
  *
  * ⚠️ SYNC NOTICE: This file ports triage logic from the SDK source:
- *   packages/squad-sdk/src/ralph/triage.ts
+ *   packages/squad-sdk/src/Watcher/triage.ts
  *
  * Any changes to routing/triage logic MUST be applied to BOTH files.
  * The SDK module is the canonical implementation; this script exists
  * for zero-dependency use in GitHub Actions workflows.
  *
- * To verify parity: npm test -- test/ralph-triage.test.ts
+ * To verify parity: npm test -- test/Watcher-triage.test.ts
  */
 'use strict';
 
@@ -48,7 +48,7 @@ function parseArgs(argv) {
 }
 
 function printUsage() {
-  console.log('Usage: node .squad/templates/ralph-triage.js --squad-dir .squad --output triage-results.json');
+  console.log('Usage: node .squad/templates/watcher-triage.js --squad-dir .squad --output triage-results.json');
 }
 
 function normalizeEol(content) {
@@ -112,7 +112,7 @@ function parseRoster(teamMd) {
   const roleIndex = findColumnIndex(table.headers, ['role']);
   if (nameIndex < 0 || roleIndex < 0) return [];
 
-  const excluded = new Set(['scribe', 'ralph']);
+  const excluded = new Set(['scribe', 'Watcher']);
   const members = [];
 
   for (const row of table.rows) {
@@ -422,7 +422,7 @@ function githubRequestJson(pathname, token) {
         headers: {
           Accept: 'application/vnd.github+json',
           Authorization: `Bearer ${token}`,
-          'User-Agent': 'squad-ralph-triage',
+          'User-Agent': 'squad-Watcher-triage',
           'X-GitHub-Api-Version': '2022-11-28',
         },
       },
