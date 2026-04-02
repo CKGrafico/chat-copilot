@@ -7,27 +7,27 @@ M1 Foundation milestone now complete. All 4 issues (#1–#5) resolved across 3 m
 ## Changes
 
 - **decisions.md**: Merged 7 decision inbox files into main file:
-  - Rusty scaffold decisions (Issue #1 architecture)
-  - Livingston PWA config decisions (Issues #3–#4)
-  - Linus Squad framework decisions (Issue #2)
-  - Review verdicts from Reuben (PR #40, #41, #42 round 1 & 2)
+  - Artist scaffold decisions (Issue #1 architecture)
+  - Vault PWA config decisions (Issues #3–#4)
+  - Asimov Squad framework decisions (Issue #2)
+  - Review verdicts from Reviewer (PR #40, #41, #42 round 1 & 2)
   - Team RTK setup decision
-  - Danny triage decision for Issue #1
+  - Lead triage decision for Issue #1
   
 - **Deleted inbox files**: All 11 files in .squad/decisions/inbox/ merged and removed
 
 - **Updated cross-agent history**:
-  - reuben/history.md: Added M1 review cycle learnings (4 PRs, all guardrails enforced, modular pattern established, rejection policy precedent)
-  - rusty/history.md: Added PR #42 fix cycle (rebase, package.json cleanup, pnpm-lock removal, merge conflict resolution) and M1 scaffold lock
-  - linus/history.md: Added shared type extraction pattern and Squad framework lock notes
+  - Reviewer/history.md: Added M1 review cycle learnings (4 PRs, all guardrails enforced, modular pattern established, rejection policy precedent)
+  - Artist/history.md: Added PR #42 fix cycle (rebase, package.json cleanup, pnpm-lock removal, merge conflict resolution) and M1 scaffold lock
+  - Asimov/history.md: Added shared type extraction pattern and Squad framework lock notes
 
 ## Team Context
 
 **Orchestration logs** written to .squad/orchestration-log/:
-- reuben-pr40-approved.md (PWA manifest + service worker APPROVED)
-- reuben-pr41-approved.md (Core domain types APPROVED)
-- rusty-pr42-fix.md (Squad framework rebase + fixes)
-- reuben-pr42-round2-approved.md (Squad framework re-review APPROVED)
+- Reviewer-pr40-approved.md (PWA manifest + service worker APPROVED)
+- Reviewer-pr41-approved.md (Core domain types APPROVED)
+- Artist-pr42-fix.md (Squad framework rebase + fixes)
+- Reviewer-pr42-round2-approved.md (Squad framework re-review APPROVED)
 
 **Session log** written to .squad/log/:
 - 20260401-m1-complete.md (Milestone summary, architecture, learnings, handoff to M2)

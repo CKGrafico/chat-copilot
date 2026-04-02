@@ -1,0 +1,62 @@
+.container{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  width:100%;
+  max-width:720px;
+}
+
+.track{
+  background:var(--surface, #eef2f6);
+  border-radius:8px;
+  height:14px;
+  position:relative;
+  overflow:hidden;
+  touch-action:none;
+}
+
+.fill{
+  background:linear-gradient(90deg, #3b82f6, #06b6d4);
+  height:100%;
+  width:0%;
+  transition:width 320ms ease;
+}
+
+.meta{
+  font-size:0.875rem;
+  color:var(--muted, #475569);
+}
+
+/* Larger touch target on mobile */
+@media (max-width:600px){
+  .track{ height:20px; border-radius:12px; }
+  .container{ padding:8px; }
+}
+
+/* Indeterminate animation */
+.indeterminate{
+  position:absolute;
+  left:-40%;
+  width:40%;
+  animation:indet 1.2s linear infinite;
+}
+@keyframes indet{
+  0%{ left:-40%; }
+  50%{ left:30%; }
+  100%{ left:100%; }
+}
+
+/* Accessible visually-hidden class */
+.visuallyHidden{
+  border:0 !important;
+  clip:rect(1px,1px,1px,1px) !important;
+  -webkit-clip-path:inset(50%);
+  clip-path:inset(50%);
+  height:1px !important;
+  margin:-1px !important;
+  overflow:hidden !important;
+  padding:0 !important;
+  position:absolute !important;
+  width:1px !important;
+  white-space:nowrap !important;
+}
