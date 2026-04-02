@@ -1,21 +1,21 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { squadService } from './squadService';
+import * as whisper from '../../features/transcription/whisperService';
 
-describe('squadService', () => {
-  it('initializes without error', () => {
-    expect(squadService).toBeDefined();
-    expect(typeof squadService.run).toBe('function');
+vi.mock('../../features/transcription/whisperService');
+
+describe('squadService transcribeAudio', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('rejects transcribeAudio with not-implemented error', async () => {
-    await expect(
-      squadService.run('transcribeAudio', { audioBuffer: new ArrayBuffer(0) }),
-    ).rejects.toThrow('not implemented');
-  });
+  it('delegates to whisperService.transcribeAudio and returns combined text', async () => {
+    const mockResult = { text: 'Hello world', language: 'en', duration: 3.0 };
+    (whisper.transcribeAudio as any).mockResolvedValue(mockResult);
 
-  it('rejects generateReply with not-implemented error', async () => {
-    await expect(
-      squadService.run('generateReply', { transcriptionText: 'hello' }),
-    ).rejects.toThrow('not implemented');
+    const res = await squadService.run('transcribeAudio', { audioBuffer: new ArrayBuffer(8) });
+    expect(res.text).toBe('Hello world');
+    expect(res.language).toBe('en');
+    expect(res.durationMs).toBe(3000);
   });
 });
