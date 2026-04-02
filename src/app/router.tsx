@@ -6,6 +6,7 @@
 // See M7 issues for the full workflow screen implementation.
 
 import { createBrowserRouter } from 'react-router-dom';
+import { ShareScreen } from '../features/share/components/ShareScreen';
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
         <p>Loading…</p>
       </div>
     ),
+  },
+  {
+    path: '/share',
+    element: <ShareScreen />,
   },
 ]);
 
