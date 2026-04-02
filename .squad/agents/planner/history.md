@@ -1,4 +1,4 @@
-# Saul — History
+# Planner — History
 
 ## Core Context
 
@@ -10,18 +10,18 @@
 
 ## Team
 
-- Danny — Lead / Architect
-- Rusty — Frontend Dev (React, PWA, share target)
-- Linus — AI Pipeline Dev (Transformers.js, inference)
-- Basher — Systems Dev (ffmpeg.wasm, audio processing)
-- Livingston — Storage & Config (IndexedDB, SW, manifest)
+- Lead — Lead / Architect
+- Artist — Frontend Dev (React, PWA, share target)
+- Asimov — AI Pipeline Dev (Transformers.js, inference)
+- Beats — Systems Dev (ffmpeg.wasm, audio processing)
+- Vault — Storage & Config (IndexedDB, SW, manifest)
 
 ## Backlog Process (decided 2026-04-01)
 
 - Source of truth: GitHub Issues
 - Labels: `frontend | ai | systems | storage` (routing), `p0-critical | p1-high | p2-normal` (priority), `bug | feature | refactor | tech-debt` (type)
 - No sprints yet — just p0 (now), p1 (this week), backlog (someday)
-- Ralph monitors and auto-routes via label → owner
+- Watcher monitors and auto-routes via label → owner
 
 ## Learnings
 
@@ -39,7 +39,7 @@
 **Backlog Structure:**
 - **7 milestones + stretch goals:** M1 (Foundation) → M2 (Ingestion) → M3 (Audio Pipeline) → M4 (Transcription) → M5 (Profiles) → M6 (Reply Generation) → M7 (Polish) → Stretch.
 - **43 total issues:** 13 P0-critical (must-have for MVP), 13 P1-high (core UX), 17 P2-normal (polish + stretch).
-- **Routing via labels:** `frontend` (Rusty), `ai` (Linus), `systems` (Basher), `storage` (Livingston). Clear ownership per issue.
+- **Routing via labels:** `frontend` (Artist), `ai` (Asimov), `systems` (Beats), `storage` (Vault). Clear ownership per issue.
 - **Dependencies tracked:** Each issue lists "Depends on" to prevent blocking. M1-M3 can run in parallel; M4-M6 sequential; M7 integrates all.
 
 **Notable patterns:**

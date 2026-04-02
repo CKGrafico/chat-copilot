@@ -1,60 +1,58 @@
 {
   "agents": {
-    "danny": {
-      "created_at": "2026-04-01T14:57:53.101Z",
-      "persistent_name": "Danny",
-      "universe": "Ocean's Eleven",
-      "status": "active"
+    "watcher": {
+      "universe": "Role-based",
+      "status": "active",
+      "persistent_name": "Watcher",
+      "created_at": "2026-04-01T14:57:53.101Z"
     },
-    "rusty": {
-      "created_at": "2026-04-01T14:57:53.101Z",
-      "persistent_name": "Rusty",
-      "universe": "Ocean's Eleven",
-      "status": "active"
+    "planner": {
+      "universe": "Role-based",
+      "status": "active",
+      "persistent_name": "Planner",
+      "created_at": "2026-04-01T15:14:27.000Z"
     },
-    "linus": {
-      "created_at": "2026-04-01T14:57:53.101Z",
-      "persistent_name": "Linus",
-      "universe": "Ocean's Eleven",
-      "status": "active"
-    },
-    "basher": {
-      "created_at": "2026-04-01T14:57:53.101Z",
-      "persistent_name": "Basher",
-      "universe": "Ocean's Eleven",
-      "status": "active"
-    },
-    "livingston": {
-      "created_at": "2026-04-01T14:57:53.101Z",
-      "persistent_name": "Livingston",
-      "universe": "Ocean's Eleven",
-      "status": "active"
+    "beats": {
+      "universe": "Role-based",
+      "status": "active",
+      "persistent_name": "Beats",
+      "created_at": "2026-04-01T14:57:53.101Z"
     },
     "scribe": {
-      "created_at": "2026-04-01T14:57:53.101Z",
+      "universe": "Role-based",
+      "status": "active",
       "persistent_name": "Scribe",
-      "universe": "Ocean's Eleven",
-      "status": "active"
+      "created_at": "2026-04-01T14:57:53.101Z"
     },
-    "ralph": {
-      "created_at": "2026-04-01T14:57:53.101Z",
-      "persistent_name": "Ralph",
-      "universe": "Ocean's Eleven",
-      "status": "active"
+    "reviewer": {
+      "universe": "Role-based",
+      "status": "active",
+      "persistent_name": "Reviewer",
+      "created_at": "2026-04-01T16:30:00.000Z"
     },
-    "saul": {
-      "created_at": "2026-04-01T15:14:27.000Z",
-      "persistent_name": "Saul",
-      "universe": "Ocean's Eleven",
-      "legacy_named": false,
-      "status": "active"
+    "artist": {
+      "universe": "Role-based",
+      "status": "active",
+      "persistent_name": "Artist",
+      "created_at": "2026-04-01T14:57:53.101Z"
     },
-    "reuben": {
-      "created_at": "2026-04-01T16:30:00.000Z",
-      "persistent_name": "Reuben",
-      "universe": "Ocean's Eleven",
-      "legacy_named": false,
-      "status": "active"
+    "asimov": {
+      "universe": "Role-based",
+      "status": "active",
+      "persistent_name": "Asimov",
+      "created_at": "2026-04-01T14:57:53.101Z"
+    },
+    "lead": {
+      "universe": "Role-based",
+      "status": "active",
+      "persistent_name": "Lead",
+      "created_at": "2026-04-01T14:57:53.101Z"
+    },
+    "vault": {
+      "universe": "Role-based",
+      "status": "active",
+      "persistent_name": "Vault",
+      "created_at": "2026-04-01T14:57:53.101Z"
     }
   }
 }

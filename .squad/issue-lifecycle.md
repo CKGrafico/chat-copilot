@@ -21,7 +21,7 @@ When connecting Squad to an issue tracker, store the connection in `.squad/team.
 **Detection triggers:**
 - User says "connect to {repo}"
 - User says "monitor {repo} for issues"
-- Ralph is activated without an issue source
+- Watcher is activated without an issue source
 
 ## Platform-Specific Issue States
 
@@ -98,7 +98,7 @@ Planner does not have native Git integration. Squad uses Planner for task tracki
 
 ### 1. Issue Assignment (Triage)
 
-**Trigger:** Ralph detects an untriaged issue or user manually assigns work.
+**Trigger:** Watcher detects an untriaged issue or user manually assigns work.
 
 **Actions:**
 1. Read `.squad/routing.md` to determine which agent should handle the issue
@@ -319,9 +319,9 @@ When spawning an agent to work on an issue, include this context block:
 4. Report PR URL to coordinator
 ```
 
-## Ralph's Role in Issue Lifecycle
+## Watcher's Role in Issue Lifecycle
 
-Ralph (the work monitor) continuously checks issue and PR state:
+Watcher (the work monitor) continuously checks issue and PR state:
 
 1. **Triage:** Detects untriaged issues, assigns `squad:{member}` labels
 2. **Spawn:** Launches agents for assigned issues
@@ -329,12 +329,12 @@ Ralph (the work monitor) continuously checks issue and PR state:
 4. **Merge:** Automatically merges approved PRs
 5. **Cleanup:** Marks issues as done when PRs merge
 
-**Ralph's work-check cycle:**
+**Watcher's work-check cycle:**
 ```
 Scan → Categorize → Dispatch → Watch → Report → Loop
 ```
 
-See `.squad/templates/ralph-reference.md` for Ralph's full lifecycle.
+See `.squad/templates/Watcher-reference.md` for Watcher's full lifecycle.
 
 ## PR Review Handling
 
@@ -343,7 +343,7 @@ See `.squad/templates/ralph-reference.md` for Ralph's full lifecycle.
 If the project has no human reviewers configured:
 1. PR opens
 2. CI runs
-3. If CI passes, Ralph auto-merges
+3. If CI passes, Watcher auto-merges
 4. Issue closes
 
 ### Human Review Required
@@ -352,7 +352,7 @@ If the project requires human approval:
 1. PR opens
 2. Human reviewer is notified (GitHub/ADO notifications)
 3. Reviewer approves or requests changes
-4. If approved + CI passes, Ralph merges
+4. If approved + CI passes, Watcher merges
 5. If changes requested, agent addresses feedback
 
 ### Squad Member Review
@@ -400,7 +400,7 @@ All PRs reviewed → All PRs merged → Epic closed
 - ❌ Leaving feature branches undeleted after merge
 - ❌ Using `checkout -b` when parallel agents are active (causes working directory conflicts)
 - ❌ Manually transitioning issue states — let the platform and Squad automation handle it
-- ❌ Skipping the branch naming convention — breaks Ralph's tracking logic
+- ❌ Skipping the branch naming convention — breaks Watcher's tracking logic
 
 ## Migration Notes
 

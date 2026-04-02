@@ -12,15 +12,15 @@
 
 | Name | Role | Charter | Status |
 |------|------|---------|--------|
-| Danny | Lead | `.squad/agents/danny/charter.md` | ✅ Active |
-| Rusty | Frontend Dev | `.squad/agents/rusty/charter.md` | ✅ Active |
-| Linus | AI Pipeline Dev | `.squad/agents/linus/charter.md` | ✅ Active |
-| Basher | Systems Dev | `.squad/agents/basher/charter.md` | ✅ Active |
-| Livingston | Storage & Config | `.squad/agents/livingston/charter.md` | ✅ Active |
-| Saul | Issue Writer | `.squad/agents/saul/charter.md` | ✅ Active |
-| Reuben | PR Reviewer | `.squad/agents/reuben/charter.md` | ✅ Active |
+| Lead | Lead | `.squad/agents/Lead/charter.md` | ✅ Active |
+| Artist | Frontend Dev | `.squad/agents/Artist/charter.md` | ✅ Active |
+| Asimov | AI Pipeline Dev | `.squad/agents/Asimov/charter.md` | ✅ Active |
+| Beats | Systems Dev | `.squad/agents/Beats/charter.md` | ✅ Active |
+| Vault | Storage & Config | `.squad/agents/Vault/charter.md` | ✅ Active |
+| Planner | Issue Writer | `.squad/agents/Planner/charter.md` | ✅ Active |
+| Reviewer | PR Reviewer | `.squad/agents/Reviewer/charter.md` | ✅ Active |
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
-| Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |
+| Watcher | Work Monitor | `.squad/agents/Watcher/charter.md` | 🔄 Monitor |
 
 ## Issue Source
 - **Repository:** CKGrafico/chat-copilot

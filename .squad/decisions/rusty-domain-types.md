@@ -1,7 +1,7 @@
-# Rusty — Domain Types Placement Decisions (Issue #5)
+# Artist — Domain Types Placement Decisions (Issue #5)
 
 **Date:** 2026-04-01
-**Agent:** Rusty (Frontend Dev)
+**Agent:** Artist (Frontend Dev)
 **Issue:** #5 — [M1] Add TypeScript types for core domain models (Audio, Profile, Session)
 **Branch:** squad/5-core-domain-types
 **Status:** Staged, awaiting commit approval
