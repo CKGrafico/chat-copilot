@@ -33,9 +33,33 @@ Example: `squad/42-fix-login-validation`
 
 When opening a PR:
 - Reference the issue: `Closes #{issue-number}`
-- If the issue had a `squad:{member}` label, mention the member: `Working as {member} ({role})`
-- If this is a 🟡 needs-review task, add to the PR description: `⚠️ This task was flagged as "needs review" — please have a squad member review before merging.`
+- If the issue had a `squad:{member}` label, mention the member by **role only**: `Working as {role}` (e.g., `Working as artist`, `Working as asimov`)
+- If this is a 🟡 needs-review task, add to the PR description: `⚠️ This task was flagged as "needs review" — reviewer agent must review before merging.`
 - Follow any project conventions in `.squad/decisions.md`
+
+## ⚠️ Agent Naming Policy (MANDATORY)
+
+**Never use human names** in any PR, issue comment, commit message, branch name, or squad config.
+
+Only use these agent role names:
+`lead`, `artist`, `asimov`, `beats`, `vault`, `planner`, `reviewer`, `scribe`, `watcher`, `copilot`, `squad`
+
+Before posting any comment or PR body, run:
+```powershell
+.\.squad\tools\check-agent-names.ps1 -Text "your text"
+```
+
+See `.squad/agent-naming-policy.md` for the full policy.
+
+## Reviewer Gate (MANDATORY)
+
+**Do NOT merge a PR without reviewer agent feedback posted to the issue.**
+
+Workflow:
+1. Developer agent implements → opens PR
+2. Reviewer agent reviews PR → posts findings to the linked issue as `[reviewer agent] ...`
+3. Developer agent applies feedback → updates PR
+4. Reviewer agent approves → PR is merged
 
 ## Decisions
 
