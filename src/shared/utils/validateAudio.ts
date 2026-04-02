@@ -7,7 +7,7 @@ const ALLOWED_MIME_TYPES = [
   'audio/webm',
 ];
 
-const ALLOWED_EXTENSIONS = ['.opus', '.ogg', '.m4a'];
+const ALLOWED_EXTENSIONS = ['.opus', '.ogg', '.m4a', '.webm'];
 
 const DEFAULT_MAX_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
@@ -54,15 +54,17 @@ export function validateAudio(
 
   // Check MIME type. Allow audio/* wildcard but prefer explicit types.
   const mimeType = (file.type || '').toLowerCase();
+  // If file.type is empty (common for some browser share targets), skip MIME check and rely on extension only.
+  if (mimeType) {
+    const allowedMime = ALLOWED_MIME_TYPES.includes(mimeType);
+    const isAudioWildcard = mimeType.startsWith('audio/');
 
-  const allowedMime = ALLOWED_MIME_TYPES.includes(mimeType);
-  const isAudioWildcard = mimeType.startsWith('audio/');
-
-  if (!allowedMime && !isAudioWildcard) {
-    return {
-      valid: false,
-      error: `Invalid MIME type. Expected audio format, got: ${file.type}`,
-    };
+    if (!allowedMime && !isAudioWildcard) {
+      return {
+        valid: false,
+        error: `Invalid MIME type. Expected audio format, got: ${file.type}`,
+      };
+    }
   }
 
   return { valid: true };

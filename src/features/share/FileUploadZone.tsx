@@ -23,7 +23,7 @@ export function FileUploadZone({ onFiles, acceptMultiple = true, maxSizeBytes }:
     const validated: File[] = [];
 
     for (const f of files) {
-      const res = validateAudio(f, maxSizeBytes ? { maxSizeBytes } : undefined as any);
+      const res = validateAudio(f, { maxSizeBytes });
       if (!res.valid) {
         setError(res.error ?? 'Invalid file');
         // Do not include invalid files
@@ -57,6 +57,13 @@ export function FileUploadZone({ onFiles, acceptMultiple = true, maxSizeBytes }:
         setDragOver(true);
       }}
       onDragLeave={() => setDragOver(false)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openFilePicker();
+        }
+      }}
+      tabIndex={0}
       style={{
         border: dragOver ? '2px dashed #007bff' : '2px dashed #ddd',
         borderRadius: 8,
@@ -68,9 +75,10 @@ export function FileUploadZone({ onFiles, acceptMultiple = true, maxSizeBytes }:
         gap: '0.75rem',
         alignItems: 'center',
         justifyContent: 'center',
+        outline: 'none',
       }}
-      aria-label="File upload zone"
-      role="region"
+      aria-label="File upload zone. Press Enter or Space to open file picker"
+      role="button"
     >
       <input
         ref={inputRef}

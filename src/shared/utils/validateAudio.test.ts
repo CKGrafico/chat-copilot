@@ -66,7 +66,7 @@ describe('validateAudio', () => {
 
     expect(result.valid).toBe(false);
     expect(result.error).toContain('Invalid file extension');
-    expect(result.error).toContain('.opus, .ogg, .m4a');
+    expect(result.error).toContain('.opus, .ogg, .m4a, .webm');
   });
 
   it('should reject file with invalid MIME type', () => {

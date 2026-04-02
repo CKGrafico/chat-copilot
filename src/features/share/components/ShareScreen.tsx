@@ -3,14 +3,11 @@ import FileUploadZone from '../../FileUploadZone';
 import { Link, useNavigate } from 'react-router-dom';
 import { useShareData } from '../hooks/useShareData';
 
-const SUPPORTED_AUDIO_TYPES = [
-  'audio/mpeg',
-  'audio/mp4',
-  'audio/ogg',
-  'audio/webm',
-  'audio/wav',
-  'audio/x-m4a',
-];
+import { validateAudio } from '../../../shared/utils/validateAudio';
+
+// Validation is centralized in validateAudio util
+import { validateAudio } from '../../../shared/utils/validateAudio';
+
 
 export function ShareScreen() {
   const { loading, files, text, error } = useShareData();
@@ -19,13 +16,10 @@ export function ShareScreen() {
 
   useEffect(() => {
     if (!loading && !error && files.length > 0) {
-      // Validate file types
-      const unsupportedFiles = files.filter(
-        file => !SUPPORTED_AUDIO_TYPES.includes(file.type)
-      );
-
-      if (unsupportedFiles.length > 0) {
-        console.error('Unsupported file types:', unsupportedFiles.map(f => f.type));
+      // Validate files using centralized validateAudio util to keep behavior consistent
+      const invalids = files.map((file) => ({ file, res: validateAudio(file) })).filter(f => !f.res.valid);
+n      if (invalids.length > 0) {
+        console.error('Invalid shared files:', invalids.map(i => ({ name: i.file.name, error: i.res.error })));
         return;
       }
 
@@ -36,8 +30,7 @@ export function ShareScreen() {
         console.log(`    Type: ${file.type}`);
         console.log(`    Size: ${(file.size / 1024).toFixed(2)} KB`);
       });
-
-      if (text) {
+n      if (text) {
         console.log('Shared text:', text);
       }
 
@@ -87,24 +80,22 @@ export function ShareScreen() {
     );
   }
 
-  // Check for unsupported file types
-  const unsupportedFiles = files.filter(
-    file => !SUPPORTED_AUDIO_TYPES.includes(file.type)
-  );
+  // Validate files and collect errors from validateAudio
+  const invalids = files.map((file) => ({ file, res: validateAudio(file) })).filter(i => !i.res.valid);
 
-  if (unsupportedFiles.length > 0) {
+  if (invalids.length > 0) {
     return (
       <div style={styles.container}>
-        <h1 style={styles.errorTitle}>Unsupported file type</h1>
+        <h1 style={styles.errorTitle}>Invalid file</h1>
         <p style={styles.errorText}>
-          The following file(s) are not supported audio formats:
+          The following file(s) failed validation:
         </p>
         <ul style={styles.fileList}>
-          {unsupportedFiles.map((file, index) => (
+          {invalids.map((item, index) => (
             <li key={index} style={styles.fileItem}>
-              <strong>{file.name}</strong>
+              <strong>{item.file.name}</strong>
               <br />
-              <span style={styles.fileType}>{file.type || 'unknown type'}</span>
+              <span style={styles.fileType}>{item.res.error ?? item.file.type || 'unknown type'}</span>
             </li>
           ))}
         </ul>
