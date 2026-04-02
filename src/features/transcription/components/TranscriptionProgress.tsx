@@ -17,13 +17,15 @@ export default function TranscriptionProgress({
   partialText = '',
 }: TranscriptionProgressProps) {
   const safeTotal = Math.max(1, totalChunks);
-  const safeCurrent = Math.min(currentChunk, safeTotal);
+  // Guard against negative values and clamp to valid range
+  const safeCurrent = Math.min(Math.max(0, currentChunk), safeTotal);
   const progress = safeCurrent / safeTotal;
   const label = `Transcribing chunk ${safeCurrent} of ${safeTotal}`;
 
   return (
     <section className={styles.container} aria-label="Transcription progress">
-      <p className={styles.status} aria-live="polite" aria-atomic="true">
+      {/* aria-live is omitted here — ProcessingProgressBar's internal live region handles announcements */}
+      <p className={styles.status}>
         {label}
       </p>
 
@@ -34,9 +36,12 @@ export default function TranscriptionProgress({
       />
 
       {partialText && (
-        <div className={styles.partial} aria-live="polite" aria-label="Partial transcription">
-          <p className={styles.partialLabel}>Partial result:</p>
-          <p className={styles.partialText}>{partialText}</p>
+        <div className={styles.partial} aria-label="Partial transcription">
+          {/* Static label kept outside the live region to avoid re-announcement on every update */}
+          <p className={styles.partialLabel} aria-hidden="true">Partial result:</p>
+          <p className={styles.partialText} aria-live="polite" aria-atomic="false">
+            {partialText}
+          </p>
         </div>
       )}
     </section>
