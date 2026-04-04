@@ -14,6 +14,7 @@ export function WorkflowScreen() {
   const { state, context, send } = useAppState();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+  const [generatedReplies, setGeneratedReplies] = useState<Array<{ id: string; text: string; length: 'short' | 'medium' | 'long'; tone: string }>>([]);
 
   useEffect(() => {
     logger.debug('Workflow', `Rendering state: ${state}`);
@@ -32,6 +33,41 @@ export function WorkflowScreen() {
         });
     }
   }, [state]);
+
+  const handleProfileSelect = (profileId: string) => {
+    logger.info('Workflow', `Profile selected: ${profileId}`);
+    setSelectedProfileId(profileId);
+    
+    // Generate demo replies based on transcription
+    const selectedProfile = profiles.find(p => p.id === profileId);
+    if (selectedProfile && context.transcriptionText) {
+      logger.info('Workflow', `Generating ${selectedProfile.name} replies for: "${context.transcriptionText}"`);
+      
+      // Demo: Generate 3 reply variants
+      const replies = [
+        {
+          id: 'reply-1',
+          text: `Thanks for reaching out! As per your message: "${context.transcriptionText.substring(0, 30)}..." I'll get back to you shortly.`,
+          length: 'short' as const,
+          tone: 'professional',
+        },
+        {
+          id: 'reply-2',
+          text: `I appreciate you sharing that. Based on your audio message about "${context.transcriptionText.substring(0, 25)}...", I've noted the details and will follow up within 24 hours with a comprehensive response.`,
+          length: 'medium' as const,
+          tone: 'friendly',
+        },
+        {
+          id: 'reply-3',
+          text: `Thank you for your message! I've reviewed your transcription: "${context.transcriptionText}". I understand the context and will address each point thoughtfully in my detailed reply coming shortly.`,
+          length: 'long' as const,
+          tone: 'warm',
+        },
+      ];
+      
+      setGeneratedReplies(replies);
+    }
+  };
 
   const handleFiles = (files: File[]) => {
     if (files.length === 0) {
@@ -139,10 +175,10 @@ export function WorkflowScreen() {
           <ProfileSelector
             profiles={profiles}
             selectedId={selectedProfileId}
-            onSelect={setSelectedProfileId}
+            onSelect={handleProfileSelect}
           />
           <ReplyCandidates
-            replies={[]}
+            replies={generatedReplies}
             loading={false}
           />
         </>
