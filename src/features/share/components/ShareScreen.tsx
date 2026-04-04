@@ -92,7 +92,7 @@ export function ShareScreen() {
             <li key={index} style={styles.fileItem}>
               <strong>{item.file.name}</strong>
               <br />
-              <span style={styles.fileType}>{item.res.error ?? item.file.type || 'unknown type'}</span>
+              <span style={styles.fileType}>{item.res.error ?? (item.file.type || 'unknown type')}</span>
             </li>
           ))}
         </ul>
