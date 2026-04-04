@@ -27,17 +27,18 @@ export function ProfileSelector({ profiles, selectedId, onSelect }: Props) {
 
   return (
     <div className="profile-selector">
-      <span className="profile-selector-label" id="profile-selector-label">
-        Reply profile
-      </span>
+      <label htmlFor="profile-select" className="profile-selector-label">
+        Select a reply profile
+      </label>
 
       {/* Desktop: styled select (hidden on mobile via CSS) */}
       <select
+        id="profile-select"
         className="profile-selector-select profile-selector-select--desktop"
-        aria-labelledby="profile-selector-label"
         value={selectedId ?? ''}
         onChange={e => handleSelect(e.target.value)}
       >
+        <option value="">Choose a profile...</option>
         {profiles.map(p => (
           <option key={p.id} value={p.id}>
             {p.name}
@@ -57,6 +58,7 @@ export function ProfileSelector({ profiles, selectedId, onSelect }: Props) {
             className={`profile-pill${selectedId === p.id ? ' profile-pill--selected' : ''}`}
             onClick={() => handleSelect(p.id)}
             aria-pressed={selectedId === p.id}
+            type="button"
           >
             <span className="profile-dot" style={{ backgroundColor: p.color }} aria-hidden="true" />
             {p.name}

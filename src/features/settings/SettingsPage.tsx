@@ -229,36 +229,6 @@ function ThemeToggle() {
   );
 }
 
-function AnalyticsToggle() {
-  const { settings, updateSettings, isLoading } = useSettings();
-
-  return (
-    <section className="settings-section">
-      <div className="settings-section-header">
-        <h2>Analytics</h2>
-        <p className="settings-section-description">
-          Help us improve by sharing anonymous usage data. All data stays on your device.
-        </p>
-      </div>
-
-      <div className="settings-checkbox-group">
-        <input
-          type="checkbox"
-          id="analytics-toggle"
-          checked={settings.analyticsEnabled}
-          onChange={(e) => updateSettings({ analyticsEnabled: e.target.checked })}
-          disabled={isLoading}
-          className="settings-checkbox"
-          aria-label="Enable analytics"
-        />
-        <label htmlFor="analytics-toggle" className="settings-checkbox-label">
-          Enable analytics tracking
-        </label>
-      </div>
-    </section>
-  );
-}
-
 export function SettingsPage() {
   const { isLoading, error } = useSettings();
 
@@ -279,7 +249,6 @@ export function SettingsPage() {
             <CacheManagement />
             <HistoryClearing />
             <ThemeToggle />
-            <AnalyticsToggle />
 
             <div className="settings-footer">
               <Link to="/" className="settings-back-link">

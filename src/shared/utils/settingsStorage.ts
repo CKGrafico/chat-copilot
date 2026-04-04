@@ -4,7 +4,6 @@ const SETTINGS_KEY = 'chat-copilot:settings';
 
 const DEFAULT_SETTINGS: AppSettings = {
   whisperModel: 'base',
-  analyticsEnabled: false,
   theme: 'dark',
 };
 

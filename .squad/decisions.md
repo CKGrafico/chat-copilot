@@ -138,12 +138,11 @@ Theme switching uses DOM class manipulation (`dark-theme`/`light-theme`) on `<ht
 ```typescript
 {
   whisperModel: 'tiny' | 'base' | 'small',
-  analyticsEnabled: boolean,
   theme: 'light' | 'dark'
 }
 ```
 
-**Default Settings:** base model, analytics off, dark theme
+**Default Settings:** base model, dark theme
 
 ---
 

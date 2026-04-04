@@ -16,7 +16,6 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 const DEFAULT_SETTINGS: AppSettings = {
   whisperModel: 'base',
-  analyticsEnabled: false,
   theme: 'dark',
 };
 
