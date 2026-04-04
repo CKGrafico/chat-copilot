@@ -7,6 +7,7 @@
 
 import { createBrowserRouter } from 'react-router-dom';
 import { ShareScreen } from '../features/share/components/ShareScreen';
+import { ProfileList } from '../features/profiles/components/ProfileList';
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
   {
     path: '/share',
     element: <ShareScreen />,
+  },
+  {
+    path: '/profiles',
+    element: <ProfileList />,
   },
 ]);
 
