@@ -1,8 +1,8 @@
 import { pipeline, env } from '@xenova/transformers';
 
-// Allow model files to be cached by the browser's Cache API (IndexedDB-backed)
+// Only use browser Cache API when it's actually available (HTTPS + no extensions blocking it)
 env.allowLocalModels = false;
-env.useBrowserCache = true;
+env.useBrowserCache = typeof globalThis.caches !== 'undefined';
 
 export type TranscriptionResult = {
   text: string;
