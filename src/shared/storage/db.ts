@@ -11,6 +11,7 @@ export class ChatCopilotDB extends Dexie {
     this.version(1).stores({
       profiles: 'id',
     });
+    // v2: adds analytics table for local event tracking (#31)
     this.version(2).stores({
       analytics: 'id',
     });

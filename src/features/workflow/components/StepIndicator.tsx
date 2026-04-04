@@ -37,7 +37,11 @@ export function StepIndicator({ currentState }: Props) {
           const isCurrent = activeIndex === i;
 
           return (
-            <li key={step.label} className="step-indicator__item">
+            <li
+              key={step.label}
+              className="step-indicator__item"
+              aria-current={isCurrent ? 'step' : undefined}
+            >
               <div className="step-indicator__dot-wrap">
                 <div
                   className={[
@@ -47,7 +51,6 @@ export function StepIndicator({ currentState }: Props) {
                   ]
                     .filter(Boolean)
                     .join(' ')}
-                  aria-current={isCurrent ? 'step' : undefined}
                   aria-label={`Step ${i + 1}: ${step.label}${isCompleted ? ' (completed)' : isCurrent ? ' (current)' : ''}`}
                 >
                   {isCompleted ? '✓' : i + 1}

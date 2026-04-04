@@ -20,16 +20,40 @@ export function WorkflowScreen() {
     }
   }, [state]);
 
-  function handleFiles(files: File[]) {
+  const handleFiles = (files: File[]) => {
     if (files.length === 0) return;
-    const file = files[0];
-    send('START_UPLOAD', { audioFile: file });
-    // Simulate upload complete (real transcription handled in M4)
-    send('UPLOAD_COMPLETE');
-  }
+    send('START_UPLOAD', { audioFile: files[0] });
+    // Let uploading state render, then advance through pipeline
+    setTimeout(() => send('UPLOAD_COMPLETE'), 500);
+  };
+
+  const stepLabels: Partial<Record<typeof state, string>> = {
+    uploading: 'Step 1 of 4: Receiving file',
+    processing: 'Step 2 of 4: Processing audio',
+    transcribing: 'Step 3 of 4: Transcribing',
+    replying: 'Step 4 of 4: Generating replies',
+    done: 'Step 4 of 4: Done',
+  };
 
   return (
     <div className="workflow-screen">
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: 0,
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0,0,0,0)',
+          whiteSpace: 'nowrap',
+          border: 0,
+        }}
+      >
+        {stepLabels[state] ?? ''}
+      </div>
       <StepIndicator currentState={state} />
 
       {state === 'idle' && (

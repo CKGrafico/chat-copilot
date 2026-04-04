@@ -27,26 +27,22 @@ export function Providers() {
       });
   }, []);
 
-  if (initError) {
-    return (
-      <p role="alert" style={{ padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif' }}>
-        {initError}
-      </p>
-    );
-  }
-
-  if (!ready) {
-    return (
-      <p style={{ padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif' }}>
-        Loading…
-      </p>
-    );
-  }
-
   return (
     <ErrorBoundary>
-      <GlobalErrorHandler />
-      <RouterProvider router={router} />
+      {initError ? (
+        <p role="alert" style={{ padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif' }}>
+          {initError}
+        </p>
+      ) : !ready ? (
+        <p style={{ padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif' }}>
+          Loading…
+        </p>
+      ) : (
+        <>
+          <GlobalErrorHandler />
+          <RouterProvider router={router} />
+        </>
+      )}
     </ErrorBoundary>
   );
 }

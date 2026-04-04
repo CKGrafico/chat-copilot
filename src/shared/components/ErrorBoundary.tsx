@@ -41,6 +41,7 @@ export class ErrorBoundary extends React.Component<
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
             onClick={() => window.location.reload()}
+            style={{ minHeight: '44px', minWidth: '44px', padding: '8px 20px', fontSize: '16px', cursor: 'pointer' }}
           >
             Refresh
           </button>

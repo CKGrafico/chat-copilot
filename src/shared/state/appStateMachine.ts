@@ -50,15 +50,19 @@ export function appStateReducer(
   const prev = state.appState;
 
   if (event === 'RESET') {
-    console.debug('[AppState]', prev, '→', 'idle', 'via', event);
+    if (import.meta.env.DEV) {
+      console.debug('[AppState]', prev, '→', 'idle', 'via', event);
+    }
     return { appState: 'idle', context: { ...INITIAL_CONTEXT } };
   }
 
   if (event === 'ERROR') {
-    console.debug('[AppState]', prev, '→', 'error', 'via', event);
+    if (import.meta.env.DEV) {
+      console.debug('[AppState]', prev, '→', 'error', 'via', event);
+    }
     return {
       appState: 'error',
-      context: { ...state.context, ...(payload ?? {}), errorMessage: payload?.errorMessage ?? state.context.errorMessage },
+      context: { ...state.context, ...(payload ?? {}) },
     };
   }
 
@@ -68,7 +72,9 @@ export function appStateReducer(
     return state;
   }
 
-  console.debug('[AppState]', prev, '→', next, 'via', event);
+  if (import.meta.env.DEV) {
+    console.debug('[AppState]', prev, '→', next, 'via', event);
+  }
   return {
     appState: next,
     context: { ...state.context, ...(payload ?? {}) },

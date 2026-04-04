@@ -81,7 +81,7 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (request.method !== 'GET') return;
 
-  // Never cache model or large binary files
+  // Model/binary files: handled separately with cache-first strategy below
   if (isModelRequest(request.url)) {
     // Cache-first strategy for model files (large binary blobs)
     event.respondWith(
