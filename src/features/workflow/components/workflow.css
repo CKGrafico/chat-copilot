@@ -194,8 +194,13 @@
 .workflow-screen__reply-controls {
   display: flex;
   align-items: flex-end;
-  gap: 16px;
+  gap: 10px;
   flex-wrap: wrap;
+}
+
+.workflow-screen__copy-prompt-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .workflow-screen__reply-controls .profile-selector {

@@ -38,6 +38,7 @@ export function WorkflowScreen() {
   const [currentFileIndex, setCurrentFileIndex] = useState(0);
   const [totalFiles, setTotalFiles] = useState(0);
   const [expandedFiles, setExpandedFiles] = useState<Set<number>>(new Set());
+  const [copied, setCopied] = useState(false);
 
   // Load profiles on mount so the selector is available before upload
   useEffect(() => {
@@ -140,6 +141,45 @@ export function WorkflowScreen() {
       setReplyLoadingLabel('');
     }
   }, [context.transcriptionText, selectedProfileId, selectedProfile]);
+
+  const handleCopyPrompt = useCallback(async () => {
+    const transcription = context.transcriptionText ?? '';
+    const profile = selectedProfile;
+
+    const prompt = [
+      '# WhatsApp Reply Assistant',
+      '',
+      profile ? [
+        '## Profile',
+        `Name: ${profile.name}`,
+        `Language: ${profile.language}`,
+        `Reply length: ${profile.replyLength}`,
+        '',
+        '## Instructions',
+        profile.instructions,
+      ].join('\n') : '## Instructions\nWrite a helpful, natural WhatsApp reply.',
+      '',
+      '## Voice Message Transcription',
+      transcription || '(no transcription)',
+      '',
+      '---',
+      'Based on the transcription above and following the instructions exactly, write a WhatsApp reply.',
+      'Output ONLY the reply text. No labels, no explanations.',
+    ].join('\n');
+
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }, [context.transcriptionText, selectedProfile]);
 
   const toggleFile = (index: number) => {
     setExpandedFiles(prev => {
@@ -259,6 +299,13 @@ export function WorkflowScreen() {
               selectedId={selectedProfileId}
               onSelect={setSelectedProfileId}
             />
+            <button
+              className="btn btn-secondary workflow-screen__copy-prompt-btn"
+              onClick={() => { void handleCopyPrompt(); }}
+              title="Copy a ready prompt to paste into ChatGPT / Claude"
+            >
+              {copied ? '✓ Copied!' : '📋 Copy prompt for ChatGPT'}
+            </button>
             <button
               className="btn btn-primary"
               onClick={() => { void handleGenerate(); }}
