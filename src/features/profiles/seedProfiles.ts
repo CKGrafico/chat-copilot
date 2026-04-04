@@ -11,6 +11,7 @@ export async function seedDefaultProfile(): Promise<void> {
     language: 'en',
     color: '#4A90E2',
     instructions: 'Generate a friendly, concise reply.',
+    replyLength: 'long',
     createdAt: new Date(),
     updatedAt: new Date(),
   });

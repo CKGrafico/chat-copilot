@@ -27,16 +27,19 @@ const capabilities: { [K in CapabilityName]: CapabilityHandler<K> } = {
   generateReply: async (input): Promise<CapabilityMap['generateReply']['output']> => {
     const instructions = input.profileInstructions ?? input.profileTone ?? '';
     const language = input.profileLanguage;
+    const replyLength = input.profileReplyLength ?? 'long';
 
     if (isLLMLoaded()) {
-      const replies = await generateRepliesWithLLM(input.transcriptionText, instructions, language);
+      const replies = await generateRepliesWithLLM(input.transcriptionText, instructions, language, replyLength);
       return { replies };
     }
 
     // LLM not yet loaded — use template engine as immediate fallback
     const lang = language ? `Language: ${language}. ` : '';
     const candidates = templateFallback(input.transcriptionText, lang + instructions);
-    return { replies: candidates };
+    // Filter to the preferred length only
+    const preferred = candidates.filter(c => c.length === replyLength);
+    return { replies: preferred.length > 0 ? preferred : candidates.slice(0, 1) };
   },
 };
 

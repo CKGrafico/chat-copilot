@@ -129,6 +129,7 @@ export function WorkflowScreen() {
         profileInstructions: selectedProfile?.instructions ?? '',
         profileName: selectedProfile?.name,
         profileLanguage: selectedProfile?.language,
+        profileReplyLength: selectedProfile?.replyLength ?? 'long',
       });
       setGeneratedReplies(result.replies);
     } catch (err) {

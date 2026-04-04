@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Profile } from '../types';
+import type { Profile, ReplyLength } from '../types';
 import './profiles.css';
 
 export type ProfileFormData = {
@@ -7,6 +7,7 @@ export type ProfileFormData = {
   language: string;
   color: string;
   instructions: string;
+  replyLength: ReplyLength;
 };
 
 const LANGUAGES = [
@@ -50,6 +51,7 @@ export function ProfileForm({ initial, onSubmit, onCancel }: ProfileFormProps) {
   const [language, setLanguage] = useState(initial?.language ?? 'en');
   const [color, setColor] = useState(initial?.color ?? COLORS[0]);
   const [instructions, setInstructions] = useState(initial?.instructions ?? '');
+  const [replyLength, setReplyLength] = useState<ReplyLength>(initial?.replyLength ?? 'long');
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -77,7 +79,7 @@ export function ProfileForm({ initial, onSubmit, onCancel }: ProfileFormProps) {
     }
     setSubmitting(true);
     try {
-      await onSubmit({ name: name.trim(), language, color, instructions: instructions.trim() });
+      await onSubmit({ name: name.trim(), language, color, instructions: instructions.trim(), replyLength });
     } finally {
       setSubmitting(false);
     }
@@ -133,6 +135,24 @@ export function ProfileForm({ initial, onSubmit, onCancel }: ProfileFormProps) {
             </option>
           ))}
         </select>
+      </div>
+
+      {/* Reply length */}
+      <div className="form-field">
+        <span className="form-label" id="pf-length-label">Reply length</span>
+        <div className="reply-length-options" role="group" aria-labelledby="pf-length-label">
+          {(['short', 'medium', 'long'] as ReplyLength[]).map(len => (
+            <button
+              key={len}
+              type="button"
+              className={`reply-length-btn${replyLength === len ? ' reply-length-btn--active' : ''}`}
+              aria-pressed={replyLength === len}
+              onClick={() => setReplyLength(len)}
+            >
+              {len.charAt(0).toUpperCase() + len.slice(1)}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Color */}

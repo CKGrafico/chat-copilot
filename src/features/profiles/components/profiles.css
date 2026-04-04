@@ -284,6 +284,35 @@
   outline: 2px solid var(--accent);
 }
 
+/* Reply length selector */
+.reply-length-options {
+  display: flex;
+  gap: 8px;
+}
+
+.reply-length-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.reply-length-btn:hover {
+  border-color: var(--accent);
+}
+
+.reply-length-btn--active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
 /* Form actions */
 .form-actions {
   display: flex;
