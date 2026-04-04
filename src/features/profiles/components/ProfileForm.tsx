@@ -32,7 +32,7 @@ const COLORS = [
 ];
 
 const NAME_MAX = 50;
-const INSTRUCTIONS_MAX = 500;
+const INSTRUCTIONS_MAX = 1200;
 
 type ProfileFormProps = {
   initial?: Profile;
