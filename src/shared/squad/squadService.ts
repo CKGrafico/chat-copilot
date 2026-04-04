@@ -10,7 +10,7 @@
 // All other imports are static so the app bundles cleanly for GitHub Pages / static hosting.
 
 import { transcribeCapability } from './transcriptionCapability';
-import { generateRepliesWithLLM, loadLLM, isLLMLoaded } from '../../features/reply/llmService';
+import { generateRepliesWithLLM, isLLMLoaded } from '../../features/reply/llmService';
 import { generateReplies as templateFallback } from '../../features/reply/templateEngine';
 import type { CapabilityMap, CapabilityName } from './types';
 

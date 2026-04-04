@@ -39,6 +39,7 @@ function makeProfile(overrides: Partial<Profile> = {}): Profile {
     language: 'en',
     color: '#000',
     instructions: 'Be helpful.',
+    replyLength: 'long',
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,

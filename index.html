@@ -7,6 +7,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#1a1a2e" />
     <title>Chat Copilot</title>
+    <script>
+      // GitHub Pages SPA: restore route after 404.html redirect
+      (function () {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+        // Also handle ?p= query param redirect
+        var search = window.location.search;
+        if (search.indexOf('?p=') === 0) {
+          var decoded = decodeURIComponent(search.slice(3));
+          history.replaceState(null, null, '/' + decoded);
+        }
+      }());
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -41,6 +41,7 @@ describe('seedDefaultProfile', () => {
       language: 'es',
       color: '#fff',
       instructions: 'Be brief.',
+      replyLength: 'long',
       createdAt: new Date(),
       updatedAt: new Date(),
     });
