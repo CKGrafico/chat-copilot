@@ -1,4 +1,4 @@
-import { AppSettings } from '../contexts/SettingsContext';
+import { AppSettings } from '../types/settings';
 
 const SETTINGS_KEY = 'chat-copilot:settings';
 

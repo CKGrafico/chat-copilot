@@ -1,13 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { loadSettings, saveSettings } from '../utils/settingsStorage';
-
-export type WhisperModel = 'tiny' | 'base' | 'small';
-
-export interface AppSettings {
-  whisperModel: WhisperModel;
-  analyticsEnabled: boolean;
-  theme: 'light' | 'dark';
-}
+import { AppSettings, WhisperModel } from '../types/settings';
 
 interface SettingsContextType {
   settings: AppSettings;
@@ -137,3 +130,6 @@ function applyTheme(theme: 'light' | 'dark') {
     document.documentElement.classList.remove('dark-theme');
   }
 }
+
+// Re-export types for backwards compatibility
+export type { AppSettings, WhisperModel };
