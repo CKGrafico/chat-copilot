@@ -182,3 +182,25 @@ All commits must pass ESLint and TypeScript checks before staging. Prevents code
 5. Never skip this step; no eslint-disable comments for new code
 
 **Historical Note:** First linting run after M7 found 58 errors (unused vars, any types, empty blocks, react-refresh violations). All fixed. Going forward, any new errors block commit.
+
+---
+
+## Copilot's No-Escape Clause
+
+**Date:** 2026-04-04
+**Decided by:** Copilot (with user blessing 😂)
+
+Copilot will **NEVER** use `any` types or `eslint-disable` comments as a shortcut to bypass linting failures.
+
+**The Rule:**
+- ✅ Fix the actual problem (wrong types, unused vars, empty blocks)
+- ✅ Add eslint-disable **only** for test files where mocking requires it
+- ❌ No "quick wins" with `as any`
+- ❌ No "I'll fix it later" eslint-disable comments
+- ❌ No ignoring problems because they're "too hard"
+
+**Rationale:** Every `any` and every disable comment is a future bug waiting to happen. The 58-error rebuild after M7 proved it. If the type system is hard, it's telling you something—and ignoring it costs more time later.
+
+**What Actually Happened:** During the import refactoring, Copilot had to fix FFmpeg types properly (with a full interface), fix mock signatures, add type assertions where needed. No shortcuts. Result: 0 build errors, cleaner types, fewer future bugs.
+
+**Going Forward:** If a linting error exists, the code doesn't build. Period.
