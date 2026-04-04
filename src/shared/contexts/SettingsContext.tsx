@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { loadSettings, saveSettings } from '../utils/settingsStorage';
-import { AppSettings, WhisperModel } from '../types/settings';
+import type { AppSettings, WhisperModel } from '../types';
 
 interface SettingsContextType {
   settings: AppSettings;

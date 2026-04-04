@@ -4,3 +4,4 @@ export type { Transcription, TranscriptionStatus } from './transcription';
 export type { AudioFile } from './audio';
 export type { Profile } from './profile';
 export type { SessionStatus, TranscriptionSession, ReplyCandidate } from './session';
+export type { AppSettings, WhisperModel } from './settings';
