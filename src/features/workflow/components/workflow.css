@@ -183,6 +183,10 @@
   white-space: nowrap;
 }
 
+.workflow-screen__idle-profile {
+  margin-bottom: 20px;
+}
+
 .workflow-screen__reply-controls {
   display: flex;
   align-items: flex-end;

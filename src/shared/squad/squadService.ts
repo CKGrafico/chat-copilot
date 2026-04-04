@@ -22,7 +22,10 @@ const capabilities: { [K in CapabilityName]: CapabilityHandler<K> } = {
 
   generateReply: async (input): Promise<CapabilityMap['generateReply']['output']> => {
     const { generateReplies } = await import('../../features/reply/templateEngine');
-    const instructions = input.profileInstructions ?? input.profileTone ?? '';
+    // Combine instructions with language hint so future LLM can use it;
+    // template engine reads style cues from the combined instructions string.
+    const lang = input.profileLanguage ? `Language: ${input.profileLanguage}. ` : '';
+    const instructions = lang + (input.profileInstructions ?? input.profileTone ?? '');
     const candidates = generateReplies(input.transcriptionText, instructions);
     return { replies: candidates };
   },

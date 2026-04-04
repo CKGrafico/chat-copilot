@@ -17,6 +17,7 @@ export type GenerateReplyInput = {
   profileName?: string;
   profileTone?: string;
   profileInstructions?: string;
+  profileLanguage?: string;
 };
 
 export type GenerateReplyOutput = {

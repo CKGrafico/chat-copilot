@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAppState } from '../../../shared/state/useAppState';
 import { FileUploadZone } from '../../share/FileUploadZone';
 import { ReplyCandidates } from '../../reply/components/ReplyCandidates';
@@ -32,20 +32,37 @@ export function WorkflowScreen() {
   const [totalFiles, setTotalFiles] = useState(0);
   const [expandedFiles, setExpandedFiles] = useState<Set<number>>(new Set());
 
+  // Load profiles on mount so the selector is available before upload
+  useEffect(() => {
+    getAllProfiles()
+      .then(loaded => {
+        setProfiles(loaded);
+        if (!getStoredProfileId() && loaded.length > 0) {
+          setSelectedProfileId(loaded[0].id);
+        }
+      })
+      .catch(err => logger.warn('Workflow', 'Failed to load profiles', err));
+  }, []);
+
+  const selectedProfile = profiles.find(p => p.id === selectedProfileId) ?? null;
+
   const handleFiles = useCallback(async (files: File[]) => {
     if (files.length === 0) return;
-    logger.info('Workflow', `${files.length} file(s) selected`);
 
-    setTotalFiles(files.length);
+    // Sort by filename — WhatsApp names are date-stamped (YYYY-MM-DD at HH.MM.SS),
+    // so lexicographic sort gives correct chronological order.
+    const sorted = [...files].sort((a, b) => a.name.localeCompare(b.name));
+    logger.info('Workflow', `${sorted.length} file(s) selected (sorted): ${sorted.map(f => f.name).join(', ')}`);
+
+    setTotalFiles(sorted.length);
     setCurrentFileIndex(0);
     setFileTranscriptions([]);
     setGeneratedReplies([]);
     setReplyError(null);
 
-    send('START_UPLOAD', { audioFile: files[0] });
+    send('START_UPLOAD', { audioFile: sorted[0] });
 
     try {
-      // Load Whisper model once upfront
       logger.info('Workflow', 'Loading Whisper model...');
       const { loadWhisperModel, transcribeAudio, decodeAudioFile } = await import('../../transcription/whisperService');
       await loadWhisperModel(p => {
@@ -56,34 +73,28 @@ export function WorkflowScreen() {
       send('UPLOAD_COMPLETE');
       send('PROCESSING_COMPLETE');
 
-      // Transcribe each file sequentially
-      const results: FileTranscription[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        setCurrentFileIndex(i + 1);
-        logger.info('Workflow', `Processing file ${i + 1}/${files.length}: ${file.name}`);
+      const profileLanguage = selectedProfile?.language;
 
-        // Decode compressed audio (ogg, m4a, opus, mp3, wav) via Web Audio API
+      // Transcribe each file sequentially using profile language hint
+      const results: FileTranscription[] = [];
+      for (let i = 0; i < sorted.length; i++) {
+        const file = sorted[i];
+        setCurrentFileIndex(i + 1);
+        logger.info('Workflow', `Processing file ${i + 1}/${sorted.length}: ${file.name}`);
+
         const audio = await decodeAudioFile(file);
         logger.debug('Workflow', `Decoded ${file.name}: ${audio.data.length} samples @ ${audio.sampling_rate}Hz`);
 
-        const result = await transcribeAudio(audio);
+        const result = await transcribeAudio(audio, profileLanguage);
         logger.info('Workflow', `File ${i + 1} transcribed: "${result.text}"`);
         results.push({ fileName: file.name, text: result.text.trim() });
         setFileTranscriptions([...results]);
       }
 
-      // Combine all transcriptions
       const combined = results.map(r => r.text).filter(Boolean).join('\n\n');
       logger.info('Workflow', `Combined transcription: "${combined}"`);
 
       send('TRANSCRIPTION_COMPLETE', { transcriptionText: combined });
-
-      const loaded = await getAllProfiles();
-      setProfiles(loaded);
-      if (!getStoredProfileId() && loaded.length > 0) {
-        setSelectedProfileId(loaded[0].id);
-      }
       send('REPLY_COMPLETE');
 
     } catch (err) {
@@ -91,19 +102,19 @@ export function WorkflowScreen() {
       logger.error('Workflow', 'Pipeline failed', err);
       send('ERROR', { errorMessage: msg });
     }
-  }, [send]);
+  }, [send, selectedProfile]);
 
   const handleGenerate = useCallback(async () => {
     if (!selectedProfileId) return;
-    const profile = profiles.find(p => p.id === selectedProfileId);
     setReplyLoading(true);
     setReplyError(null);
     try {
       const { squadService } = await import('../../../shared/squad/squadService');
       const result = await squadService.run('generateReply', {
         transcriptionText: context.transcriptionText ?? '',
-        profileInstructions: profile?.instructions ?? '',
-        profileName: profile?.name,
+        profileInstructions: selectedProfile?.instructions ?? '',
+        profileName: selectedProfile?.name,
+        profileLanguage: selectedProfile?.language,
       });
       setGeneratedReplies(result.replies);
     } catch (err) {
@@ -111,7 +122,7 @@ export function WorkflowScreen() {
     } finally {
       setReplyLoading(false);
     }
-  }, [context.transcriptionText, selectedProfileId, profiles]);
+  }, [context.transcriptionText, selectedProfileId, selectedProfile]);
 
   const toggleFile = (index: number) => {
     setExpandedFiles(prev => {
@@ -145,8 +156,15 @@ export function WorkflowScreen() {
         <>
           <h1 className="workflow-screen__heading">Upload Audio</h1>
           <p className="workflow-screen__progress-hint">
-            Share one or multiple audio files — they'll be transcribed and combined into a single reply.
+            Select a profile first — the language and tone will be used during transcription and reply generation.
           </p>
+          <div className="workflow-screen__idle-profile">
+            <ProfileSelector
+              profiles={profiles}
+              selectedId={selectedProfileId}
+              onSelect={setSelectedProfileId}
+            />
+          </div>
           <FileUploadZone onFiles={files => { void handleFiles(files); }} acceptMultiple={true} />
         </>
       )}

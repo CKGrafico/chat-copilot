@@ -82,6 +82,25 @@ export function resetWhisperModelForTests(): void {
  */
 const WHISPER_SAMPLE_RATE = 16000;
 
+// Maps ISO 639-1 codes → Whisper language names (English lowercase)
+const ISO_TO_WHISPER: Record<string, string> = {
+  en: 'english', es: 'spanish', fr: 'french', de: 'german', it: 'italian',
+  pt: 'portuguese', nl: 'dutch', ru: 'russian', zh: 'chinese', ja: 'japanese',
+  ko: 'korean', ar: 'arabic', hi: 'hindi', pl: 'polish', sv: 'swedish',
+  da: 'danish', fi: 'finnish', nb: 'norwegian', tr: 'turkish', cs: 'czech',
+  ro: 'romanian', hu: 'hungarian', uk: 'ukrainian', el: 'greek', he: 'hebrew',
+};
+
+/**
+ * Converts an ISO 639-1 code or full language name to the Whisper-expected format.
+ * Falls back to undefined (auto-detect) if not recognised.
+ */
+export function toWhisperLanguage(lang?: string): string | undefined {
+  if (!lang) return undefined;
+  const lower = lang.toLowerCase().trim();
+  return ISO_TO_WHISPER[lower] ?? (lower.length > 2 ? lower : undefined);
+}
+
 export async function decodeAudioFile(file: File): Promise<{ data: Float32Array; sampling_rate: number }> {
   const arrayBuffer = await file.arrayBuffer();
   // Force 16kHz so AudioContext resamples during decode — Transformers.js passes
@@ -112,14 +131,23 @@ export async function decodeAudioFile(file: File): Promise<{ data: Float32Array;
  * Transcribe decoded audio using the cached Whisper pipeline.
  * Call loadWhisperModel() first.
  * Pass the output of decodeAudioFile() directly.
+ * @param language - Optional ISO 639-1 code or English language name (e.g. 'es', 'spanish')
  */
 export async function transcribeAudio(
   audio: { data: Float32Array; sampling_rate: number },
+  language?: string,
 ): Promise<TranscriptionResult> {
   if (!_pipeline) throw new Error('Whisper model not loaded. Call loadWhisperModel() first.');
 
+  const whisperLang = toWhisperLanguage(language);
+  const options: Record<string, unknown> = { sampling_rate: audio.sampling_rate };
+  if (whisperLang) {
+    options.language = whisperLang;
+    options.task = 'transcribe';
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const result: any = await (_pipeline as any)(audio.data, { sampling_rate: audio.sampling_rate });
+  const result: any = await (_pipeline as any)(audio.data, options);
 
   return {
     text: result?.text ?? '',
