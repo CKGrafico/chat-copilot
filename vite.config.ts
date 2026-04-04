@@ -4,8 +4,8 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // GitHub Pages serves from /chat-copilot/ — set base so assets resolve correctly
-  base: '/chat-copilot/',
+  // Custom domain (chatcopilot.ckgrafico.com) serves from root — base must be '/'
+  base: '/',
   plugins: [react()],
   test: {
     environment: 'node',
