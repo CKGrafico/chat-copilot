@@ -47,6 +47,35 @@
   font-size: 16px;
   margin: 0;
 }
+
+.workflow-screen__progress-hint {
+  font-size: 14px;
+  color: var(--text);
+  margin: 0;
+}
+
+.workflow-screen__transcription {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-h);
+}
+
+.workflow-screen__reply-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.workflow-screen__reply-controls .profile-selector {
+  flex: 1;
+  min-width: 240px;
+  margin-bottom: 0;
+}
 
 .workflow-screen__retry-btn {
   display: inline-flex;
