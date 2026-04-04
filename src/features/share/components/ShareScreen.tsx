@@ -5,9 +5,6 @@ import { useShareData } from '../hooks/useShareData';
 
 import { validateAudio } from '../../../shared/utils/validateAudio';
 
-// Validation is centralized in validateAudio util
-import { validateAudio } from '../../../shared/utils/validateAudio';
-
 
 export function ShareScreen() {
   const { loading, files, text, error } = useShareData();
@@ -18,7 +15,7 @@ export function ShareScreen() {
     if (!loading && !error && files.length > 0) {
       // Validate files using centralized validateAudio util to keep behavior consistent
       const invalids = files.map((file) => ({ file, res: validateAudio(file) })).filter(f => !f.res.valid);
-n      if (invalids.length > 0) {
+      if (invalids.length > 0) {
         console.error('Invalid shared files:', invalids.map(i => ({ name: i.file.name, error: i.res.error })));
         return;
       }
@@ -30,7 +27,7 @@ export function ShareScreen() {
         console.log(`    Type: ${file.type}`);
         console.log(`    Size: ${(file.size / 1024).toFixed(2)} KB`);
       });
-n      if (text) {
+      if (text) {
         console.log('Shared text:', text);
       }
 
