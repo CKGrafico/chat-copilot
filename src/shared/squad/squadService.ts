@@ -2,8 +2,8 @@
 // All AI operations (transcription, reply generation) route through squadService.run().
 // The service layer owns capability lifecycle; components observe state only.
 //
-// M4 will implement transcribeAudio (Whisper via Transformers.js Web Worker).
-// M6 will implement generateReply (template engine, Phase 2: LLM).
+// M4 implements transcribeAudio (Whisper via Transformers.js Web Worker).
+// M6 implements generateReply (template engine Phase 1, Phase 2: LLM).
 
 import type { CapabilityMap, CapabilityName } from './types';
 
@@ -19,10 +19,11 @@ const capabilities: { [K in CapabilityName]: CapabilityHandler<K> } = {
   },
 
 
-  generateReply: async (_input): Promise<CapabilityMap['generateReply']['output']> => {
-    // TODO M6: select matching templates or invoke LLM, inject profile context
-    // Returns ranked reply suggestions with tone metadata
-    throw new Error('generateReply: not implemented — see M6');
+  generateReply: async (input): Promise<CapabilityMap['generateReply']['output']> => {
+    const { generateReplies } = await import('../../features/reply/templateEngine');
+    const instructions = input.profileInstructions ?? input.profileTone ?? '';
+    const candidates = generateReplies(input.transcriptionText, instructions);
+    return { replies: candidates };
   },
 };
 

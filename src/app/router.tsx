@@ -8,6 +8,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { ShareScreen } from '../features/share/components/ShareScreen';
 import { ProfileList } from '../features/profiles/components/ProfileList';
+import { ReplyScreen } from '../features/reply/components/ReplyScreen';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   {
     path: '/profiles',
     element: <ProfileList />,
+  },
+  {
+    path: '/reply',
+    element: <ReplyScreen transcriptionText="Sample transcription for testing." />,
   },
 ]);
 

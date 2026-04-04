@@ -16,13 +16,15 @@ export type GenerateReplyInput = {
   transcriptionText: string;
   profileName?: string;
   profileTone?: string;
+  profileInstructions?: string;
 };
 
 export type GenerateReplyOutput = {
   replies: Array<{
     id: string;
     text: string;
-    tone: 'formal' | 'casual' | 'friendly';
+    length: 'short' | 'medium' | 'long';
+    tone: string;
   }>;
 };
 
