@@ -1,4 +1,4 @@
-import { db } from '../../storage/db';
+import { db } from '../storage/db';
 
 export type AnalyticsEvent = {
   id: string;

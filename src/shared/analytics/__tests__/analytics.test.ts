@@ -1,5 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
+// Mock localStorage for node test environment
+const localStorageData: Record<string, string> = {};
+vi.stubGlobal('localStorage', {
+  getItem: (key: string) => localStorageData[key] ?? null,
+  setItem: (key: string, value: string) => { localStorageData[key] = value; },
+  removeItem: (key: string) => { delete localStorageData[key]; },
+  clear: () => { for (const key of Object.keys(localStorageData)) delete localStorageData[key]; },
+});
+
 const { mockAnalyticsTable } = vi.hoisted(() => {
   const store: Record<string, unknown> = {};
   const mockAnalyticsTable = {
@@ -18,7 +27,7 @@ const { mockAnalyticsTable } = vi.hoisted(() => {
   return { mockAnalyticsTable };
 });
 
-vi.mock('../../../storage/db', () => ({
+vi.mock('../../storage/db', () => ({
   db: { analytics: mockAnalyticsTable },
 }));
 
@@ -49,8 +58,9 @@ describe('analytics', () => {
         delete mockAnalyticsTable._store[key];
       }
     });
-    // Reset localStorage analytics key (defaults to disabled)
-    localStorage.removeItem('chat-copilot:analytics-enabled');
+    // Reset analytics enabled state (defaults to disabled)
+    localStorageData['chat-copilot:analytics-enabled'] = 'false';
+    delete localStorageData['chat-copilot:analytics-enabled'];
   });
 
   it('is disabled by default — trackEvent does nothing', async () => {
