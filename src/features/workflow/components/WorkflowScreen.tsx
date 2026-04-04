@@ -40,12 +40,33 @@ export function WorkflowScreen() {
     }
     logger.info('Workflow', `File selected: ${files[0].name} (${files[0].size} bytes)`);
     send('START_UPLOAD', { audioFile: files[0] });
-    // Let uploading state render, then advance through pipeline
+    
+    // Simulate upload completion
     logger.debug('Workflow', 'Starting 500ms uploading delay...');
     setTimeout(() => {
       logger.debug('Workflow', 'Sending UPLOAD_COMPLETE');
       send('UPLOAD_COMPLETE');
     }, 500);
+
+    // Simulate processing completion
+    setTimeout(() => {
+      logger.debug('Workflow', 'Sending PROCESSING_COMPLETE');
+      send('PROCESSING_COMPLETE');
+    }, 1500);
+
+    // Simulate transcription completion
+    setTimeout(() => {
+      logger.debug('Workflow', 'Sending TRANSCRIPTION_COMPLETE');
+      send('TRANSCRIPTION_COMPLETE', {
+        transcriptionText: 'This is a demo transcription of your audio file.',
+      });
+    }, 3000);
+
+    // Simulate reply generation completion
+    setTimeout(() => {
+      logger.debug('Workflow', 'Sending REPLY_COMPLETE');
+      send('REPLY_COMPLETE');
+    }, 4500);
   };
 
   const stepLabels: Partial<Record<typeof state, string>> = {
