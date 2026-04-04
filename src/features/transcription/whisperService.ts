@@ -140,7 +140,12 @@ export async function transcribeAudio(
   if (!_pipeline) throw new Error('Whisper model not loaded. Call loadWhisperModel() first.');
 
   const whisperLang = toWhisperLanguage(language);
-  const options: Record<string, unknown> = { sampling_rate: audio.sampling_rate };
+  const options: Record<string, unknown> = {
+    sampling_rate: audio.sampling_rate,
+    // return_timestamps enables chunk-level decoding which significantly
+    // reduces hallucination loops (repeated phrases) on the tiny model.
+    return_timestamps: true,
+  };
   if (whisperLang) {
     options.language = whisperLang;
     options.task = 'transcribe';
@@ -149,11 +154,51 @@ export async function transcribeAudio(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result: any = await (_pipeline as any)(audio.data, options);
 
+  const rawText: string = result?.text ?? '';
+
   return {
-    text: result?.text ?? '',
+    text: deduplicateRepetitions(rawText),
     language: result?.chunks?.[0]?.language ?? undefined,
     duration: result?.chunks?.length
       ? result.chunks[result.chunks.length - 1]?.timestamp?.[1]
       : undefined,
   };
+}
+
+/**
+ * Removes excessive phrase repetition that the Whisper tiny model sometimes
+ * produces when audio quality is low or speech is unclear.
+ * Detects any repeated n-gram (5–15 words) that appears more than 3 times
+ * and collapses it to a single occurrence.
+ */
+export function deduplicateRepetitions(text: string): string {
+  const words = text.split(/\s+/);
+  if (words.length < 20) return text;
+
+  // Try window sizes from longest to shortest to catch the biggest loops first
+  for (let windowSize = 15; windowSize >= 5; windowSize--) {
+    for (let i = 0; i <= words.length - windowSize * 3; i++) {
+      const phrase = words.slice(i, i + windowSize).join(' ');
+      // Count how many times this phrase repeats from position i
+      let count = 0;
+      let pos = i;
+      while (pos + windowSize <= words.length) {
+        const candidate = words.slice(pos, pos + windowSize).join(' ');
+        if (candidate.toLowerCase() === phrase.toLowerCase()) {
+          count++;
+          pos += windowSize;
+        } else {
+          break;
+        }
+      }
+      if (count >= 3) {
+        // Keep one copy, remove the rest
+        const before = words.slice(0, i + windowSize);
+        const after = words.slice(pos);
+        return deduplicateRepetitions([...before, ...after].join(' '));
+      }
+    }
+  }
+
+  return text;
 }

@@ -64,6 +64,8 @@
   color: var(--text-h);
   white-space: pre-wrap;
   word-break: break-word;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 /* Multi-file transcription list */
@@ -153,6 +155,8 @@
   background: var(--bg);
   white-space: pre-wrap;
   word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 /* In-progress file chips during transcription */
