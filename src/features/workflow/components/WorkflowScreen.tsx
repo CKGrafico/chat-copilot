@@ -7,7 +7,7 @@ import ProcessingProgressBar from '../../../shared/components/ProcessingProgress
 import { StepIndicator } from './StepIndicator';
 import { getAllProfiles } from '../../profiles/profileStore';
 import { logger } from '../../../shared/utils/logger';
-import type { Profile } from '../../../shared/types';
+import type { Profile } from '../../../types/profile';
 import './workflow.css';
 
 export function WorkflowScreen() {

@@ -2,7 +2,7 @@
 // Combines transcription text + active profile context into a structured input
 // for either the template engine (Phase 1) or LLM (Phase 2 stretch).
 
-import type { Transcription } from '../../shared/types';
+import type { Transcription } from '../../types/transcription';
 
 export type PromptContext = {
   transcription: Transcription;

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import type { Profile } from '../../../shared/types';
+import type { Profile } from '../../../types/profile';
 import './reply.css';
 
 const STORAGE_KEY = 'chat-copilot:selected-profile';
