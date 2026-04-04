@@ -40,8 +40,8 @@ const templates: Record<Category, Record<StyleKey, TemplateTriplet>> = {
     ],
     casual: [
       'Good question! Happy to help.',
-      "Great question! Let me think about that for a sec. I've got a few thoughts I'd love to share — it's something I've been thinking about too.",
-      "Oh, that's such a good question! I've been thinking about it myself and have quite a few thoughts. Let me walk you through what I know, and feel free to ask follow-ups — I love digging into this kind of stuff! There's a lot of nuance here and I want to make sure we cover it all.",
+      "Great question! Let me think about that for a sec. I've got a few thoughts I'd love to share, it's something I've been thinking about too.",
+      "Oh, that's such a good question! I've been thinking about it myself and have quite a few thoughts. Let me walk you through what I know, and feel free to ask follow-ups. I love digging into this kind of stuff! There's a lot of nuance here and I want to make sure we cover it all.",
     ],
     default: [
       'Good question. Let me think about that.',
@@ -80,7 +80,7 @@ const templates: Record<Category, Record<StyleKey, TemplateTriplet>> = {
     default: [
       'Understood. Thanks for sharing that.',
       "Thanks for sharing. I've been thinking about this and wanted to share a few thoughts. Let me know what you think.",
-      "Thanks for bringing this up — it's something worth discussing. I've given it some thought and have a few perspectives I'd like to share. I think it's important to look at this from multiple angles, so let me walk through my thinking and we can go from there.",
+      "Thanks for bringing this up. It's something worth discussing. I've given it some thought and have a few perspectives I'd like to share. I think it's important to look at this from multiple angles, so let me walk through my thinking and we can go from there.",
     ],
   },
   fallback: {
