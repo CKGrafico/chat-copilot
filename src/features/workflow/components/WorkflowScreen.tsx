@@ -1,18 +1,18 @@
-import { useState, useCallback, useEffect } from 'react';
-import { useAppState } from '../../../shared/state/useAppState';
-import { FileUploadZone } from '../../share/FileUploadZone';
-import { ReplyCandidates } from '../../reply/components/ReplyCandidates';
-import { ProfileSelector } from '../../reply/components/ProfileSelector';
+import { useCallback, useEffect, useState } from 'react';
 import ProcessingProgressBar from '../../../shared/components/ProcessingProgressBar';
-import { StepIndicator } from './StepIndicator';
-import { getAllProfiles } from '../../profiles/profileStore';
-import { getStoredProfileId } from '../../reply/profileStorage';
-import { logger } from '../../../shared/utils/logger';
-import { sortFiles } from '../sortFiles';
 import { squadService } from '../../../shared/squad/squadService';
-import { loadLLM, isWebGPUSupported } from '../../reply/llmService';
-import type { Profile } from '../../profiles/profile';
 import type { GenerateReplyOutput } from '../../../shared/squad/types';
+import { useAppState } from '../../../shared/state/useAppState';
+import { logger } from '../../../shared/utils/logger';
+import type { Profile } from '../../profiles/profile';
+import { getAllProfiles } from '../../profiles/profileStore';
+import { ProfileSelector } from '../../reply/components/ProfileSelector';
+import { ReplyCandidates } from '../../reply/components/ReplyCandidates';
+import { isWebGPUSupported, loadLLM } from '../../reply/llmService';
+import { getStoredProfileId } from '../../reply/profileStorage';
+import { FileUploadZone } from '../../share/FileUploadZone';
+import { sortFiles } from '../sortFiles';
+import { StepIndicator } from './StepIndicator';
 import './workflow.css';
 // whisperService is imported dynamically inside handleFiles because @xenova/transformers
 // is ~4MB — it should only be downloaded when the user actually uploads audio.
@@ -269,7 +269,7 @@ export function WorkflowScreen() {
           </div>
 
           {replyLoading && replyLoadingLabel && (
-            <ProcessingProgressBar indeterminate label={replyLoadingLabel} />
+            <ProcessingProgressBar indeterminate label={replyLoadingLabel} value={0} />
           )}
 
           {replyError && (
