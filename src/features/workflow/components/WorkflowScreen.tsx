@@ -10,11 +10,13 @@ import { getStoredProfileId } from '../../reply/profileStorage';
 import { logger } from '../../../shared/utils/logger';
 import { sortFiles } from '../sortFiles';
 import { squadService } from '../../../shared/squad/squadService';
+import { loadLLM, isWebGPUSupported } from '../../reply/llmService';
 import type { Profile } from '../../profiles/profile';
 import type { GenerateReplyOutput } from '../../../shared/squad/types';
 import './workflow.css';
 // whisperService is imported dynamically inside handleFiles because @xenova/transformers
 // is ~4MB — it should only be downloaded when the user actually uploads audio.
+// WebLLM (~1.9GB) is loaded lazily when the user clicks "Generate Replies".
 
 type Reply = GenerateReplyOutput['replies'][number];
 
@@ -29,6 +31,7 @@ export function WorkflowScreen() {
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(getStoredProfileId);
   const [generatedReplies, setGeneratedReplies] = useState<Reply[]>([]);
   const [replyLoading, setReplyLoading] = useState(false);
+  const [replyLoadingLabel, setReplyLoadingLabel] = useState('');
   const [replyError, setReplyError] = useState<string | null>(null);
   const [modelProgress, setModelProgress] = useState(0);
   const [fileTranscriptions, setFileTranscriptions] = useState<FileTranscription[]>([]);
@@ -111,7 +114,16 @@ export function WorkflowScreen() {
     if (!selectedProfileId) return;
     setReplyLoading(true);
     setReplyError(null);
+    setGeneratedReplies([]);
     try {
+      // Load LLM lazily on first use (downloads ~1.9GB model, then browser-cached)
+      if (isWebGPUSupported()) {
+        setReplyLoadingLabel('Loading AI model…');
+        await loadLLM(undefined, (pct, text) => {
+          setReplyLoadingLabel(text || `Loading AI… ${pct}%`);
+        });
+      }
+      setReplyLoadingLabel('Generating replies…');
       const result = await squadService.run('generateReply', {
         transcriptionText: context.transcriptionText ?? '',
         profileInstructions: selectedProfile?.instructions ?? '',
@@ -120,9 +132,11 @@ export function WorkflowScreen() {
       });
       setGeneratedReplies(result.replies);
     } catch (err) {
+      logger.error('Workflow', 'Reply generation failed', err);
       setReplyError(err instanceof Error ? err.message : 'Failed to generate replies.');
     } finally {
       setReplyLoading(false);
+      setReplyLoadingLabel('');
     }
   }, [context.transcriptionText, selectedProfileId, selectedProfile]);
 
@@ -249,9 +263,13 @@ export function WorkflowScreen() {
               onClick={() => { void handleGenerate(); }}
               disabled={replyLoading || !selectedProfileId}
             >
-              {replyLoading ? '⟳ Generating...' : '✓ Generate Replies'}
+              {replyLoading ? '⟳ ' + (replyLoadingLabel || 'Generating…') : '✓ Generate Replies'}
             </button>
           </div>
+
+          {replyLoading && replyLoadingLabel && (
+            <ProcessingProgressBar indeterminate label={replyLoadingLabel} />
+          )}
 
           {replyError && (
             <div className="workflow-screen__error-box" role="alert">

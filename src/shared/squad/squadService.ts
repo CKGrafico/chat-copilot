@@ -10,7 +10,8 @@
 // All other imports are static so the app bundles cleanly for GitHub Pages / static hosting.
 
 import { transcribeCapability } from './transcriptionCapability';
-import { generateReplies } from '../../features/reply/templateEngine';
+import { generateRepliesWithLLM, loadLLM, isLLMLoaded } from '../../features/reply/llmService';
+import { generateReplies as templateFallback } from '../../features/reply/templateEngine';
 import type { CapabilityMap, CapabilityName } from './types';
 
 type CapabilityHandler<K extends CapabilityName> = (
@@ -24,11 +25,17 @@ const capabilities: { [K in CapabilityName]: CapabilityHandler<K> } = {
   },
 
   generateReply: async (input): Promise<CapabilityMap['generateReply']['output']> => {
-    // Combine instructions with language hint so future LLM can use it;
-    // template engine reads style cues from the combined instructions string.
-    const lang = input.profileLanguage ? `Language: ${input.profileLanguage}. ` : '';
-    const instructions = lang + (input.profileInstructions ?? input.profileTone ?? '');
-    const candidates = generateReplies(input.transcriptionText, instructions);
+    const instructions = input.profileInstructions ?? input.profileTone ?? '';
+    const language = input.profileLanguage;
+
+    if (isLLMLoaded()) {
+      const replies = await generateRepliesWithLLM(input.transcriptionText, instructions, language);
+      return { replies };
+    }
+
+    // LLM not yet loaded — use template engine as immediate fallback
+    const lang = language ? `Language: ${language}. ` : '';
+    const candidates = templateFallback(input.transcriptionText, lang + instructions);
     return { replies: candidates };
   },
 };
