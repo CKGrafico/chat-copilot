@@ -1,21 +1,25 @@
 // Service Worker — Chat Copilot
-// M1: Static asset caching only. Model file caching is deferred to M7 (#28).
+// M7 (#28): Added dedicated cache-first strategy for Whisper model files.
+// Bump MODEL_CACHE_NAME to 'chat-copilot-models-v2' when the Whisper model changes.
 
 const CACHE_NAME = 'chat-copilot-shell-v1';
+const MODEL_CACHE_NAME = 'chat-copilot-models-v1';
 
 // Assets pre-cached on install (app shell)
 const PRECACHE_URLS = ['/'];
 
-// Patterns to skip caching entirely (Whisper / ffmpeg model files are large binary blobs)
+// Patterns that identify Whisper / large binary model requests
 const MODEL_URL_PATTERNS = [
+  /huggingface\.co/,
+  /cdn-lfs\.huggingface\.co/,
+  /cdn-lfs-us-1\.huggingface\.co/,
   /\.onnx$/,
   /\.bin$/,
-  /huggingface\.co/,
-  /cdn-lfs/,
+  /\.onnx_data$/,
 ];
 
 /**
- * Returns true when the URL matches a model/binary asset that must not be cached yet.
+ * Returns true when the URL matches a Hugging Face CDN or model binary asset.
  * @param {string} url
  * @returns {boolean}
  */
@@ -54,7 +58,14 @@ self.addEventListener('activate', (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key !== CACHE_NAME)
+            .filter((key) => {
+              if (key === CACHE_NAME) return false;
+              if (key === MODEL_CACHE_NAME) return false;
+              // Delete any stale model caches from previous versions
+              if (key.startsWith('chat-copilot-models-')) return true;
+              // Delete any other stale shell caches
+              return true;
+            })
             .map((key) => caches.delete(key)),
         ),
       )
@@ -70,8 +81,26 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (request.method !== 'GET') return;
 
-  // Never cache model or large binary files
-  if (isModelRequest(request.url)) return;
+  // Model/binary files: handled separately with cache-first strategy below
+  if (isModelRequest(request.url)) {
+    // Cache-first strategy for model files (large binary blobs)
+    event.respondWith(
+      caches.open(MODEL_CACHE_NAME).then((cache) =>
+        cache.match(request).then((cached) => {
+          if (cached) return cached;
+          return fetch(request)
+            .then((response) => {
+              if (response.ok) {
+                cache.put(request, response.clone());
+              }
+              return response;
+            })
+            .catch(() => Response.error());
+        }),
+      ),
+    );
+    return;
+  }
 
   if (request.mode === 'navigate') {
     // Navigation: network-first, fall back to cached root shell
