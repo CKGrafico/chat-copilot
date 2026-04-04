@@ -1,3 +1,5 @@
+import { logger } from '../utils/logger';
+
 export type AppState =
   | 'idle'
   | 'uploading'
@@ -50,16 +52,12 @@ export function appStateReducer(
   const prev = state.appState;
 
   if (event === 'RESET') {
-    if (import.meta.env.DEV) {
-      console.debug('[AppState]', prev, '→', 'idle', 'via', event);
-    }
+    logger.info('AppState', `RESET: ${prev} → idle`, payload);
     return { appState: 'idle', context: { ...INITIAL_CONTEXT } };
   }
 
   if (event === 'ERROR') {
-    if (import.meta.env.DEV) {
-      console.debug('[AppState]', prev, '→', 'error', 'via', event);
-    }
+    logger.error('AppState', `ERROR: ${prev} → error`, payload);
     return {
       appState: 'error',
       context: { ...state.context, ...(payload ?? {}) },
@@ -68,13 +66,11 @@ export function appStateReducer(
 
   const next = TRANSITIONS[prev]?.[event];
   if (!next) {
-    // Invalid transition — silently ignore
+    logger.warn('AppState', `Invalid transition: ${prev} + ${event}`, null);
     return state;
   }
 
-  if (import.meta.env.DEV) {
-    console.debug('[AppState]', prev, '→', next, 'via', event);
-  }
+  logger.info('AppState', `${prev} → ${next} (${event})`);
   return {
     appState: next,
     context: { ...state.context, ...(payload ?? {}) },
