@@ -1,12 +1,13 @@
 // Seeds a default profile on first app launch if no profiles exist.
 import { getAllProfiles, createProfile } from './profileStore';
+import { generateId } from '../../shared/utils/generateId';
 
 export async function seedDefaultProfile(): Promise<void> {
   const profiles = await getAllProfiles();
   if (profiles.length > 0) return;
 
   await createProfile({
-    id: crypto.randomUUID(),
+    id: generateId(),
     name: 'Default',
     language: 'en',
     color: '#4A90E2',

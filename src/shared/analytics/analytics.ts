@@ -1,4 +1,5 @@
 import { db } from '../storage/db';
+import { generateId } from '../utils/generateId';
 
 export type AnalyticsEvent = {
   id: string;
@@ -32,7 +33,7 @@ export async function trackEvent(
   if (!isAnalyticsEnabled()) return;
   try {
     const event: AnalyticsEvent = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       name,
       metadata,
       timestamp: new Date().toISOString(),

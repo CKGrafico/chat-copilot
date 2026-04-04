@@ -2,6 +2,8 @@
 // Detects intent from transcription text and returns 3 ranked reply candidates.
 // Phase 2 (stretch): replace templates with LLM generation via Squad AI capability.
 
+import { generateId } from '../../shared/utils/generateId';
+
 export type ReplyCandidate = {
   id: string;
   text: string;
@@ -117,7 +119,7 @@ export function generateReplies(text: string, instructions: string): ReplyCandid
   const tone = TONE_LABELS[style];
 
   return triplet.map((tmpl, i) => ({
-    id: crypto.randomUUID(),
+    id: generateId(),
     text: tmpl,
     length: LENGTHS[i],
     tone,

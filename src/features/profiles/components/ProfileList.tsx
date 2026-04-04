@@ -3,6 +3,7 @@ import type { Profile } from '../types';
 import { useProfiles } from '../hooks/useProfiles';
 import { ProfileCard } from './ProfileCard';
 import { ProfileForm, type ProfileFormData } from './ProfileForm';
+import { generateId } from '../../../shared/utils/generateId';
 import './profiles.css';
 
 export function ProfileList() {
@@ -49,7 +50,7 @@ export function ProfileList() {
       } else {
         const now = new Date();
         await createProfile({
-          id: crypto.randomUUID(),
+          id: generateId(),
           ...data,
           createdAt: now,
           updatedAt: now,

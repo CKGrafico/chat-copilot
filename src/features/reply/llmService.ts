@@ -12,6 +12,7 @@
 import { CreateMLCEngine, type MLCEngineInterface } from '@mlc-ai/web-llm';
 import type { ReplyCandidate } from './templateEngine';
 import { generateReplies as templateFallback } from './templateEngine';
+import { generateId } from '../../shared/utils/generateId';
 
 export const DEFAULT_LLM_MODEL = 'Qwen3-1.7B-q4f16_1-MLC';
 
@@ -119,6 +120,6 @@ FORMAT: ${lengthGuide}
   const text = raw.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
   if (!text) return templateFallback(transcriptionText, profileInstructions);
 
-  return [{ id: crypto.randomUUID(), text, length: replyLength, tone: 'ai' }];
+  return [{ id: generateId(), text, length: replyLength, tone: 'ai' }];
 }
 
