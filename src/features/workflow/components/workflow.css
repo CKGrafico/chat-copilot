@@ -212,6 +212,62 @@
   opacity: 0.7;
 }
 
+.workflow-screen__paste-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.workflow-screen__paste-label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.workflow-screen__paste-btn {
+  width: 100%;
+  max-width: 320px;
+}
+
+.workflow-screen__paste-zone {
+  width: 100%;
+  max-width: 320px;
+  min-height: 48px;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  font-size: 13px;
+  cursor: text;
+  outline: none;
+  text-align: center;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.workflow-screen__paste-zone::before {
+  content: 'or long-press here → Paste';
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.workflow-screen__paste-zone:focus {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.workflow-screen__paste-error {
+  margin: 0;
+  font-size: 13px;
+  color: #d9534f;
+  text-align: center;
+}
+
 .workflow-screen__reply-controls .profile-selector {
   flex: 1;
   min-width: 240px;

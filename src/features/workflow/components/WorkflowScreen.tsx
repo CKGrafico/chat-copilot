@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ProcessingProgressBar from '../../../shared/components/ProcessingProgressBar';
 import { squadService } from '../../../shared/squad/squadService';
 import type { GenerateReplyOutput } from '../../../shared/squad/types';
@@ -38,7 +38,8 @@ export function WorkflowScreen() {
   const [expandedFiles, setExpandedFiles] = useState<Set<number>>(new Set());
   const [copied, setCopied] = useState(false);
 
-  // Load profiles on mount so the selector is available before upload
+  const [pasteError, setPasteError] = useState<string | null>(null);
+  const pasteZoneRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     getAllProfiles()
       .then(loaded => {
@@ -179,6 +180,37 @@ export function WorkflowScreen() {
     setTimeout(() => setCopied(false), 2500);
   }, [context.transcriptionText, selectedProfile]);
 
+  // Clipboard paste button — works on mobile where paste events need a user gesture
+  const handlePasteButton = useCallback(async () => {
+    setPasteError(null);
+    try {
+      if (!navigator.clipboard?.read) {
+        // Fallback: focus the paste zone so the user can long-press → Paste
+        pasteZoneRef.current?.focus();
+        return;
+      }
+      const clipboardItems = await navigator.clipboard.read();
+      const audioFiles: File[] = [];
+      for (const item of clipboardItems) {
+        const audioType = item.types.find(t => t.startsWith('audio/'));
+        if (audioType) {
+          const blob = await item.getType(audioType);
+          const ext = audioType.split('/')[1]?.split(';')[0] ?? 'ogg';
+          audioFiles.push(new File([blob], `pasted-audio.${ext}`, { type: audioType }));
+        }
+      }
+      if (audioFiles.length > 0) {
+        void handleFiles(audioFiles);
+      } else {
+        setPasteError('No audio found in clipboard. Copy a voice message in WhatsApp first.');
+      }
+    } catch {
+      // If clipboard.read() is blocked, focus the paste zone as fallback
+      pasteZoneRef.current?.focus();
+      setPasteError('Tap and hold the area below, then choose Paste.');
+    }
+  }, [handleFiles]);
+
   // Android Web Share Target: SW stores shared files in IndexedDB and redirects to ?shared=1
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -253,11 +285,36 @@ export function WorkflowScreen() {
             />
           </div>
           <FileUploadZone onFiles={files => { void handleFiles(files); }} acceptMultiple={true} />
-          <p className="workflow-screen__paste-hint">
-            📱 On iOS: Copy audio in WhatsApp, then <strong>long-press here → Paste</strong>
-            <br />
-            🤖 On Android: installed as app → Share directly from WhatsApp
-          </p>
+
+          {/* iOS paste zone — contenteditable captures paste events on mobile */}
+          <div className="workflow-screen__paste-section">
+            <p className="workflow-screen__paste-label">📱 iOS: Copy audio in WhatsApp, then:</p>
+            <button
+              className="btn btn-secondary workflow-screen__paste-btn"
+              onClick={() => { void handlePasteButton(); }}
+            >
+              📋 Paste audio from clipboard
+            </button>
+            <div
+              ref={pasteZoneRef}
+              className="workflow-screen__paste-zone"
+              contentEditable
+              suppressContentEditableWarning
+              tabIndex={0}
+              aria-label="Paste zone — tap and hold to paste audio"
+              onPaste={(e) => {
+                e.preventDefault();
+                const items = Array.from(e.clipboardData?.items ?? []);
+                const audioItems = items.filter(item => item.kind === 'file' && item.type.startsWith('audio/'));
+                const files = audioItems.map(item => item.getAsFile()).filter((f): f is File => f !== null);
+                if (files.length > 0) void handleFiles(files);
+                else setPasteError('No audio found. Copy a WhatsApp voice message first.');
+              }}
+            >
+            </div>
+            {pasteError && <p className="workflow-screen__paste-error">{pasteError}</p>}
+            <p className="workflow-screen__paste-hint">🤖 Android: install as app → Share from WhatsApp</p>
+          </div>
         </>
       )}
 
