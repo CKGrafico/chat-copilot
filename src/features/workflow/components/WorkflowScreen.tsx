@@ -8,6 +8,7 @@ import { StepIndicator } from './StepIndicator';
 import { getAllProfiles } from '../../profiles/profileStore';
 import { getStoredProfileId } from '../../reply/profileStorage';
 import { logger } from '../../../shared/utils/logger';
+import { sortFiles } from '../sortFiles';
 import type { Profile } from '../../profiles/profile';
 import type { GenerateReplyOutput } from '../../../shared/squad/types';
 import './workflow.css';
@@ -49,10 +50,9 @@ export function WorkflowScreen() {
   const handleFiles = useCallback(async (files: File[]) => {
     if (files.length === 0) return;
 
-    // Sort by filename — WhatsApp names are date-stamped (YYYY-MM-DD at HH.MM.SS),
-    // so lexicographic sort gives correct chronological order.
-    const sorted = [...files].sort((a, b) => a.name.localeCompare(b.name));
-    logger.info('Workflow', `${sorted.length} file(s) selected (sorted): ${sorted.map(f => f.name).join(', ')}`);
+    // Sort by date/timestamp extracted from filename, then lastModified, then natural string order
+    const sorted = sortFiles(files);
+    logger.info('Workflow', `${sorted.length} file(s) sorted: ${sorted.map(f => f.name).join(', ')}`);
 
     setTotalFiles(sorted.length);
     setCurrentFileIndex(0);
