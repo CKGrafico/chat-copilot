@@ -53,13 +53,15 @@ See `.squad/agent-naming-policy.md` for the full policy.
 
 ## Reviewer Gate (MANDATORY)
 
-**Do NOT merge a PR without reviewer agent feedback posted to the issue.**
+**Do NOT merge a PR without reviewer agent feedback posted as inline GitHub PR comments.**
 
 Workflow:
-1. Developer agent implements → opens PR
-2. Reviewer agent reviews PR → posts findings to the linked issue as `[reviewer agent] ...`
-3. Developer agent applies feedback → updates PR
-4. Reviewer agent approves → PR is merged
+1. Developer agent implements changes on feature branch, opens PR
+2. Reviewer agent reviews PR, posts findings as inline GitHub review comments (`gh api repos/{owner}/{repo}/pulls/{PR}/reviews`)
+3. Developer agent applies feedback, pushes updates
+4. Reviewer agent approves, PR is merged
+
+Severity prefixes: 🔴 BLOCKER / 🟡 WARNING / 🔵 MINOR
 
 ## Decisions
 

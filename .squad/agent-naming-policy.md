@@ -1,14 +1,12 @@
-# Squad Agent Naming Policy
+# Agent Naming Policy
 
-## Rule: Agent Roles Only — No Human Names
+All squad communications (PRs, issues, commits, branch names, code comments) **must use agent role names only**. No human names.
 
-All squad communications (PR titles, PR bodies, PR comments, issue comments, branch names, commit messages, code comments, and squad config files) **must use agent role names only**.
+## Valid Names
 
-### Valid Agent Names (exhaustive list)
-
-| Role | Use This |
-|------|----------|
-| Coordinator | `squad` (the orchestrator) |
+| Role | Name |
+|------|------|
+| Coordinator | `squad` |
 | Tech Lead | `lead` |
 | Frontend Dev | `artist` |
 | AI/Inference | `asimov` |
@@ -20,27 +18,9 @@ All squad communications (PR titles, PR bodies, PR comments, issue comments, bra
 | Issue Monitor | `watcher` |
 | Coding Agent | `copilot` |
 
-### Forbidden
+## Rules
 
-- Any first-name or surname references (e.g., "Danny", "Ralph", "Reuben", "Saul", "Rusty", "Linus", "Livingston", "Basher")
-- Any GitHub @mention of a human (use agent role labels instead)
-- Any `@username` in PR/issue comments that refers to a human
-
-### Enforcement
-
-1. **Copilot** (coding agent): before posting any comment or PR body, check it contains no human names.
-2. **Reviewer** (agent): reject any PR or issue comment that contains a human name — post a correction comment citing this policy.
-3. **Watcher** (agent): flag any issue or PR that violates naming policy during triage.
-4. **CI (optional)**: a lint script at `.squad/tools/check-agent-names.ps1` can scan PR bodies for forbidden names.
-
-### PR/Issue Comment Template
-
-When acting as an agent, always prefix comments with the agent role:
-
-```
-[reviewer agent] <message>
-[artist agent] <message>
-[asimov agent] <message>
-```
-
-Never use human names in these prefixes.
+- No human first names, surnames, or `@username` mentions in automated content
+- Prefix agent comments with the role: `[reviewer agent] ...`
+- Reviewer rejects any PR or comment that contains a human name
+- CI lint script: `.squad/tools/check-agent-names.ps1`

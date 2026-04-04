@@ -1,81 +1,79 @@
 # Chat Copilot
 
-A local-first PWA that transcribes WhatsApp audio and generates contextual reply suggestions — fully in-browser, no backend.
+A local-first PWA that transcribes WhatsApp audio and generates contextual reply suggestions. Runs fully in-browser using Whisper via Transformers.js. No backend required.
 
-## Development with GitHub Copilot
+## Why This Repo Exists
 
-This project uses the **Squad** agent for AI-assisted development. Always run Copilot with:
+This project demonstrates how to use **Squad** (an AI team framework) with **GitHub Copilot** to build real software using a structured workflow:
+
+1. **Issues** define the work (features, bugs, refactors)
+2. **Triage** routes issues to the right specialist agent
+3. **Feature branches** isolate changes (`squad/{issue}-{slug}`)
+4. **Pull requests** link back to issues (`Closes #N`)
+5. **Inline PR reviews** catch problems before merge (posted as GitHub review comments)
+6. **Merge and close** completes the cycle
+
+Every step is tracked in GitHub. Every decision is documented. Every review is auditable.
+
+## The Squad Team
+
+| Agent | Role | Owns |
+|-------|------|------|
+| **Lead** | Architect | Architecture decisions, triage, review escalation |
+| **Artist** | Frontend Dev | React components, CSS, routing, UX |
+| **Asimov** | AI Pipeline Dev | Transformers.js, Squad capabilities, inference |
+| **Beats** | Systems Dev | Audio processing, ffmpeg.wasm, service worker |
+| **Vault** | Storage & Config | IndexedDB, Dexie, PWA manifest, caching |
+| **Planner** | Issue Writer | Backlog decomposition, acceptance criteria |
+| **Reviewer** | PR Reviewer | Code review via inline GitHub PR comments |
+| **Scribe** | Session Logger | Decision merging, cross-agent memory |
+| **Watcher** | Work Monitor | Issue triage, stale detection, label sync |
+
+Team roster: [`.squad/team.md`](.squad/team.md)
+Routing rules: [`.squad/routing.md`](.squad/routing.md)
+Team decisions: [`.squad/decisions.md`](.squad/decisions.md)
+
+## Key Guardrails
+
+- **No autonomous commits to main.** Agents work on feature branches. Merges require explicit approval.
+- **Inline PR reviews are mandatory.** Reviewer posts findings as GitHub review comments on the exact file and line, not as chat text. Severity: BLOCKER / WARNING / MINOR.
+- **No cross-feature imports.** Features communicate through `src/shared/` only.
+- **No human names in automation.** Agents use role names only (`lead`, `artist`, `reviewer`).
+- **AI capabilities route through Squad service.** UI never imports AI modules directly.
+
+See [`.squad/decisions.md`](.squad/decisions.md) for the full list.
+
+## Project Structure
+
+```
+src/
+  app/                    # Router, providers (composition root)
+  features/
+    share/                # WhatsApp share-target ingestion
+    transcription/        # Whisper model loading + transcription
+    reply/                # Template-based reply generation
+    profiles/             # User profiles (IndexedDB CRUD)
+    workflow/             # Main orchestration screen + state machine
+  shared/
+    analytics/            # Local-only opt-in analytics
+    components/           # ErrorBoundary, GlobalErrorHandler
+    squad/                # Squad capability service (AI abstraction)
+    state/                # App state machine (pure reducer)
+    storage/              # Dexie database
+    types/                # Cross-feature types
+    utils/                # Shared utilities
+```
+
+## Getting Started
 
 ```bash
-copilot --agent squad
+pnpm install
+pnpm dev
 ```
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Vite 8** + **React 19** + **TypeScript** (strict)
+- **Dexie 4** (IndexedDB)
+- **Transformers.js** (Whisper, in-browser)
+- **PWA** with share-target and model caching
