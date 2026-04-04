@@ -1,0 +1,147 @@
+.privacy-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 2rem 1rem;
+}
+
+.privacy-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 3rem 2rem;
+}
+
+.privacy-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.privacy-section {
+  margin-bottom: 2.5rem;
+}
+
+.privacy-section h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 0.5rem;
+}
+
+.privacy-section p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.privacy-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 1rem 0;
+}
+
+.privacy-list li {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.privacy-list ul li:before,
+.privacy-list ol li:before {
+  content: '';
+}
+
+.privacy-section ul li:before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #4a90e2;
+  font-weight: bold;
+}
+
+.privacy-section ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
+
+.privacy-section ol li {
+  padding-left: 0.5rem;
+}
+
+.privacy-link {
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid #4a90e2;
+  transition: color 0.2s ease;
+}
+
+.privacy-link:hover {
+  color: #2e5c8a;
+  border-bottom-color: #2e5c8a;
+}
+
+.privacy-note {
+  background-color: #f0f4ff;
+  border-left: 4px solid #4a90e2;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+  color: #333;
+  font-style: italic;
+}
+
+.privacy-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.privacy-back-link {
+  display: inline-block;
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #4a90e2;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.privacy-back-link:hover {
+  background-color: #4a90e2;
+  color: white;
+  border-color: #4a90e2;
+}
+
+@media (max-width: 600px) {
+  .privacy-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .privacy-heading {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .privacy-section h2 {
+    font-size: 1.1rem;
+  }
+
+  .privacy-section p,
+  .privacy-list li {
+    font-size: 0.95rem;
+  }
+}

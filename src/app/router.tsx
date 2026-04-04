@@ -10,23 +10,34 @@ import { ShareScreen } from '../features/share/components/ShareScreen';
 import { ProfileList } from '../features/profiles/components/ProfileList';
 import { ReplyScreen } from '../features/reply/components/ReplyScreen';
 import { WorkflowScreen } from '../features/workflow/components/WorkflowScreen';
+import { PrivacyPage } from '../features/privacy/PrivacyPage';
+import { RootLayout } from './RootLayout';
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <WorkflowScreen />,
-  },
-  {
-    path: '/share',
-    element: <ShareScreen />,
-  },
-  {
-    path: '/profiles',
-    element: <ProfileList />,
-  },
-  {
-    path: '/reply',
-    element: <ReplyScreen transcriptionText="Sample transcription for testing." />,
+    element: <RootLayout />,
+    children: [
+      {
+        path: '/',
+        element: <WorkflowScreen />,
+      },
+      {
+        path: '/share',
+        element: <ShareScreen />,
+      },
+      {
+        path: '/profiles',
+        element: <ProfileList />,
+      },
+      {
+        path: '/reply',
+        element: <ReplyScreen transcriptionText="Sample transcription for testing." />,
+      },
+      {
+        path: '/privacy',
+        element: <PrivacyPage />,
+      },
+    ],
   },
 ]);
 
