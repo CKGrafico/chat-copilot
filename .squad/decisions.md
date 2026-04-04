@@ -158,3 +158,27 @@ Clear buttons in SettingsPage delegate to SettingsContext methods:
 - `clearConversationHistory()`: Deletes `'chat-copilot'` IndexedDB database
 
 Both throw errors on failure (caller handles error UI). User should confirm before clearing.
+
+---
+
+## Pre-Commit Linting & Type Checks (Mandatory)
+
+**Date:** 2026-04-05
+**Decided by:** Lead (user directive)
+
+All commits must pass ESLint and TypeScript checks before staging. Prevents code quality regressions.
+
+**Requirement:**
+- `pnpm lint` must return 0 errors
+- `pnpm type-check` must return 0 errors
+- If checks fail, fix violations before committing
+- CI blocks merges on lint/type failures anyway
+
+**Agent Workflow:**
+1. Implement changes
+2. Run `pnpm lint && pnpm type-check`
+3. If failures, fix and re-run
+4. Only when both pass: `git add` and present for user approval
+5. Never skip this step; no eslint-disable comments for new code
+
+**Historical Note:** First linting run after M7 found 58 errors (unused vars, any types, empty blocks, react-refresh violations). All fixed. Going forward, any new errors block commit.

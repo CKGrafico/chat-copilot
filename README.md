@@ -124,7 +124,21 @@ git commit -m "fix: per user feedback, address reply generation"
 
 CI script enforces: `.squad/tools/check-agent-names.ps1`
 
-### Rule 5: Rejection Lockout
+### Rule 5: Linting Before Commit
+All code must pass linting and type checking before commit.
+
+```bash
+# Before committing:
+pnpm lint        # ESLint strict mode
+pnpm type-check  # TypeScript no-emit check
+
+# Only if both pass: commit and push
+git commit -m "feat: ..."
+```
+
+If linting fails, fix issues first. CI will block merges anyway. Squad agents run these checks automatically before all commits.
+
+### Rule 6: Rejection Lockout
 If Reviewer rejects your PR, you can't re-work it. Someone else fixes the blockers.
 
 ```

@@ -32,6 +32,9 @@ Example: `squad/42-fix-login-validation`
 ## PR Guidelines
 
 When opening a PR:
+- **BEFORE committing:** Run `pnpm lint` and `pnpm type-check` to ensure no errors
+  - If linting fails, fix errors before pushing
+  - CI will block merges if linting fails
 - Reference the issue: `Closes #{issue-number}`
 - If the issue had a `squad:{member}` label, mention the member by **role only**: `Working as {role}` (e.g., `Working as artist`, `Working as asimov`)
 - If this is a 🟡 needs-review task, add to the PR description: `⚠️ This task was flagged as "needs review" — reviewer agent must review before merging.`
