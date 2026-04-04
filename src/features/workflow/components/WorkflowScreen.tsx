@@ -47,7 +47,7 @@ export function WorkflowScreen() {
     try {
       // Load Whisper model once upfront
       logger.info('Workflow', 'Loading Whisper model...');
-      const { loadWhisperModel, transcribeAudio } = await import('../../transcription/whisperService');
+      const { loadWhisperModel, transcribeAudio, decodeAudioFile } = await import('../../transcription/whisperService');
       await loadWhisperModel(p => {
         setModelProgress(p);
         logger.debug('Workflow', `Model loading: ${p}%`);
@@ -63,16 +63,11 @@ export function WorkflowScreen() {
         setCurrentFileIndex(i + 1);
         logger.info('Workflow', `Processing file ${i + 1}/${files.length}: ${file.name}`);
 
-        let audioBuffer: ArrayBuffer;
-        try {
-          const { normalizeAudio } = await import('../../transcription/audioProcessor');
-          audioBuffer = await normalizeAudio(file);
-        } catch {
-          logger.warn('Workflow', `Normalization failed for ${file.name}, using raw buffer`);
-          audioBuffer = await file.arrayBuffer();
-        }
+        // Decode compressed audio (ogg, m4a, opus, mp3, wav) via Web Audio API
+        const audio = await decodeAudioFile(file);
+        logger.debug('Workflow', `Decoded ${file.name}: ${audio.data.length} samples @ ${audio.sampling_rate}Hz`);
 
-        const result = await transcribeAudio(audioBuffer);
+        const result = await transcribeAudio(audio);
         logger.info('Workflow', `File ${i + 1} transcribed: "${result.text}"`);
         results.push({ fileName: file.name, text: result.text.trim() });
         setFileTranscriptions([...results]);

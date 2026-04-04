@@ -1,10 +1,14 @@
-import { transcribeAudio } from '../../features/transcription/whisperService';
+import { transcribeAudio, decodeAudioFile } from '../../features/transcription/whisperService';
 import type { TranscribeAudioInput, TranscribeAudioOutput } from './types';
 
 export async function transcribeCapability(input: TranscribeAudioInput): Promise<TranscribeAudioOutput> {
-  // The whisperService.transcribeAudio expects a 16kHz mono Float32 ArrayBuffer.
-  // Here the input.audioBuffer is already expected to be prepared by audioProcessor.
-  const result = await transcribeAudio(input.audioBuffer);
+  // Decode compressed audio to Float32Array via Web Audio API, then transcribe
+  // input.audioBuffer is a raw File or ArrayBuffer — we need to decode it first
+  // For now we create a dummy blob and decode via Web Audio API
+  const blob = new Blob([input.audioBuffer]);
+  const file = new File([blob], 'audio');
+  const audio = await decodeAudioFile(file);
+  const result = await transcribeAudio(audio);
 
   return {
     text: result.text,

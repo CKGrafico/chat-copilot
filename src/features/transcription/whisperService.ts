@@ -76,17 +76,46 @@ export function resetWhisperModelForTests(): void {
 }
 
 /**
- * Transcribe a 16kHz mono WAV ArrayBuffer using the cached Whisper pipeline.
- * Call loadWhisperModel() first.
+ * Decode a compressed audio file (ogg, opus, m4a, mp3, wav, etc.) using the
+ * browser's native Web Audio API, then mix down to mono Float32Array.
+ * Returns the samples and the native sample rate (Transformers.js will resample).
  */
-export async function transcribeAudio(audioBuffer: ArrayBuffer): Promise<TranscriptionResult> {
+export async function decodeAudioFile(file: File): Promise<{ data: Float32Array; sampling_rate: number }> {
+  const arrayBuffer = await file.arrayBuffer();
+  const audioContext = new AudioContext();
+  let audioBuffer: AudioBuffer;
+  try {
+    audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  } finally {
+    void audioContext.close();
+  }
+
+  const { numberOfChannels, length, sampleRate } = audioBuffer;
+
+  // Mix all channels down to mono
+  const mono = new Float32Array(length);
+  for (let c = 0; c < numberOfChannels; c++) {
+    const channelData = audioBuffer.getChannelData(c);
+    for (let i = 0; i < length; i++) {
+      mono[i] += channelData[i] / numberOfChannels;
+    }
+  }
+
+  return { data: mono, sampling_rate: sampleRate };
+}
+
+/**
+ * Transcribe decoded audio using the cached Whisper pipeline.
+ * Call loadWhisperModel() first.
+ * Pass the output of decodeAudioFile() directly.
+ */
+export async function transcribeAudio(
+  audio: { data: Float32Array; sampling_rate: number },
+): Promise<TranscriptionResult> {
   if (!_pipeline) throw new Error('Whisper model not loaded. Call loadWhisperModel() first.');
 
-  // Convert ArrayBuffer → Float32Array (PCM samples expected by Transformers.js)
-  const floatArray = new Float32Array(audioBuffer);
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const result: any = await (_pipeline as any)(floatArray, { sampling_rate: 16000 });
+  const result: any = await (_pipeline as any)(audio.data, { sampling_rate: audio.sampling_rate });
 
   return {
     text: result?.text ?? '',

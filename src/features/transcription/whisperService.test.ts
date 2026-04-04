@@ -112,7 +112,8 @@ describe('whisperService', () => {
 
   describe('transcribeAudio', () => {
     it('throws if model not loaded', async () => {
-      await expect(transcribeAudio(new ArrayBuffer(8))).rejects.toThrow(
+      const audio = { data: new Float32Array(8), sampling_rate: 16000 };
+      await expect(transcribeAudio(audio)).rejects.toThrow(
         'Whisper model not loaded',
       );
     });
@@ -122,7 +123,8 @@ describe('whisperService', () => {
       mockPipelineFn.mockResolvedValue({ text: 'Hello world' });
 
       await loadWhisperModel();
-      const result = await transcribeAudio(new Float32Array([0, 0.1, 0.2]).buffer);
+      const audio = { data: new Float32Array([0, 0.1, 0.2]), sampling_rate: 16000 };
+      const result = await transcribeAudio(audio);
 
       expect(result.text).toBe('Hello world');
     });
@@ -135,7 +137,8 @@ describe('whisperService', () => {
       });
 
       await loadWhisperModel();
-      const result = await transcribeAudio(new Float32Array(16000).buffer);
+      const audio = { data: new Float32Array(16000), sampling_rate: 16000 };
+      const result = await transcribeAudio(audio);
 
       expect(result.duration).toBe(3.0);
       expect(result.language).toBe('en');
