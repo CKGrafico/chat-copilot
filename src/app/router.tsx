@@ -9,17 +9,12 @@ import { createBrowserRouter } from 'react-router-dom';
 import { ShareScreen } from '../features/share/components/ShareScreen';
 import { ProfileList } from '../features/profiles/components/ProfileList';
 import { ReplyScreen } from '../features/reply/components/ReplyScreen';
+import { WorkflowScreen } from '../features/workflow/components/WorkflowScreen';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: (
-      // TODO: Replace with the real WorkflowScreen component from M7
-      <div style={{ fontFamily: 'sans-serif', padding: '2rem', textAlign: 'center' }}>
-        <h1>Chat Copilot</h1>
-        <p>Loading…</p>
-      </div>
-    ),
+    element: <WorkflowScreen />,
   },
   {
     path: '/share',
