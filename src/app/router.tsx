@@ -11,6 +11,7 @@ import { ProfileList } from '../features/profiles/components/ProfileList';
 import { ReplyScreen } from '../features/reply/components/ReplyScreen';
 import { WorkflowScreen } from '../features/workflow/components/WorkflowScreen';
 import { PrivacyPage } from '../features/privacy/PrivacyPage';
+import { SettingsPage } from '../features/settings/SettingsPage';
 import { RootLayout } from './RootLayout';
 
 const router = createBrowserRouter([
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: '/privacy',
         element: <PrivacyPage />,
+      },
+      {
+        path: '/settings',
+        element: <SettingsPage />,
       },
     ],
   },

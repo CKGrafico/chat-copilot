@@ -114,3 +114,47 @@ RTK compresses CLI output before it reaches the LLM. Agents prefix commands with
 rtk git status
 rtk npm run build
 ```
+
+---
+
+## Settings Infrastructure: Theme via CSS Classes
+
+**Date:** 2026-04-04
+**Decided by:** Vault (Lead approved)
+
+Theme switching uses DOM class manipulation (`dark-theme`/`light-theme`) on `<html>` instead of `color-scheme`.
+
+**Why:** Explicit control over CSS variable scope, independent of system preferences.
+
+**Implementation:**
+- `src/shared/contexts/SettingsContext.tsx`: Manages settings state + theme application
+- `src/shared/utils/settingsStorage.ts`: localStorage persistence layer
+- `src/shared/styles/theme.css`: Light/dark CSS variable definitions
+- SettingsProvider loads settings on app mount and applies theme immediately
+
+**Storage Key:** `'chat-copilot:settings'` (namespaced to avoid collisions)
+
+**Settings Model:**
+```typescript
+{
+  whisperModel: 'tiny' | 'base' | 'small',
+  analyticsEnabled: boolean,
+  theme: 'light' | 'dark'
+}
+```
+
+**Default Settings:** base model, analytics off, dark theme
+
+---
+
+## Cache & History Clearing
+
+**Date:** 2026-04-04
+**Decided by:** Beats
+
+Clear buttons in SettingsPage delegate to SettingsContext methods:
+
+- `clearModelCache()`: Deletes Service Worker caches + IndexedDB model stores (any DB with 'whisper'/'model' in name)
+- `clearConversationHistory()`: Deletes `'chat-copilot'` IndexedDB database
+
+Both throw errors on failure (caller handles error UI). User should confirm before clearing.

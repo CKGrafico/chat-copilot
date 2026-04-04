@@ -45,6 +45,15 @@ export function Navigation() {
             </Link>
           </li>
           <li>
+            <Link
+              to="/settings"
+              className={`nav-link ${isActive('/settings') ? 'nav-link--active' : ''}`}
+              aria-current={isActive('/settings') ? 'page' : undefined}
+            >
+              Settings
+            </Link>
+          </li>
+          <li>
             <a
               href="https://github.com/CKGrafico/chat-copilot"
               target="_blank"

@@ -11,6 +11,8 @@ import { initDB } from '../shared/storage/db';
 import { seedDefaultProfile } from '../features/profiles/seedProfiles';
 import { ErrorBoundary } from '../shared/components/ErrorBoundary';
 import { GlobalErrorHandler } from '../shared/components/GlobalErrorHandler';
+import { SettingsProvider } from '../shared/contexts/SettingsContext';
+import '../shared/styles/theme.css';
 import router from './router';
 
 export function Providers() {
@@ -38,10 +40,12 @@ export function Providers() {
           Loading…
         </p>
       ) : (
-        <>
-          <GlobalErrorHandler />
-          <RouterProvider router={router} />
-        </>
+        <SettingsProvider>
+          <>
+            <GlobalErrorHandler />
+            <RouterProvider router={router} />
+          </>
+        </SettingsProvider>
       )}
     </ErrorBoundary>
   );
