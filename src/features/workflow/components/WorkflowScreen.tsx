@@ -94,14 +94,14 @@ export function WorkflowScreen() {
   }, [send]);
 
   const handleGenerate = useCallback(async () => {
-    if (!context.transcriptionText || !selectedProfileId) return;
+    if (!selectedProfileId) return;
     const profile = profiles.find(p => p.id === selectedProfileId);
     setReplyLoading(true);
     setReplyError(null);
     try {
       const { squadService } = await import('../../../shared/squad/squadService');
       const result = await squadService.run('generateReply', {
-        transcriptionText: context.transcriptionText,
+        transcriptionText: context.transcriptionText ?? '',
         profileInstructions: profile?.instructions ?? '',
         profileName: profile?.name,
       });

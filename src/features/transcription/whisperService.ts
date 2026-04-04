@@ -80,9 +80,13 @@ export function resetWhisperModelForTests(): void {
  * browser's native Web Audio API, then mix down to mono Float32Array.
  * Returns the samples and the native sample rate (Transformers.js will resample).
  */
+const WHISPER_SAMPLE_RATE = 16000;
+
 export async function decodeAudioFile(file: File): Promise<{ data: Float32Array; sampling_rate: number }> {
   const arrayBuffer = await file.arrayBuffer();
-  const audioContext = new AudioContext();
+  // Force 16kHz so AudioContext resamples during decode — Transformers.js passes
+  // Float32Array through without resampling, so we must deliver 16kHz ourselves.
+  const audioContext = new AudioContext({ sampleRate: WHISPER_SAMPLE_RATE });
   let audioBuffer: AudioBuffer;
   try {
     audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
@@ -90,7 +94,7 @@ export async function decodeAudioFile(file: File): Promise<{ data: Float32Array;
     void audioContext.close();
   }
 
-  const { numberOfChannels, length, sampleRate } = audioBuffer;
+  const { numberOfChannels, length } = audioBuffer;
 
   // Mix all channels down to mono
   const mono = new Float32Array(length);
@@ -101,7 +105,7 @@ export async function decodeAudioFile(file: File): Promise<{ data: Float32Array;
     }
   }
 
-  return { data: mono, sampling_rate: sampleRate };
+  return { data: mono, sampling_rate: WHISPER_SAMPLE_RATE };
 }
 
 /**
