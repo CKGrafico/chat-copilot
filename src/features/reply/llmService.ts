@@ -3,8 +3,9 @@
  * No server, no API key, no backend. Model files are fetched from
  * HuggingFace CDN on first use and cached in the browser.
  *
- * Default model: Phi-3.5-mini-instruct (~2.2GB download, ~3.7GB VRAM)
- * Chosen for strong instruction-following at a manageable size.
+ * Default model: Qwen3-1.7B (April 2025) — the lightest modern model with
+ * strong multilingual instruction-following. ~1GB download / ~2GB VRAM.
+ * Upgrade path: Qwen3-4B (~2.5GB) for higher quality at similar storage.
  * Falls back to template engine if WebGPU is not available.
  */
 
@@ -12,7 +13,7 @@ import { CreateMLCEngine, type MLCEngineInterface } from '@mlc-ai/web-llm';
 import type { ReplyCandidate } from './templateEngine';
 import { generateReplies as templateFallback } from './templateEngine';
 
-export const DEFAULT_LLM_MODEL = 'Phi-3.5-mini-instruct-q4f16_1-MLC';
+export const DEFAULT_LLM_MODEL = 'Qwen3-1.7B-q4f16_1-MLC';
 
 export type LLMProgressCallback = (percent: number, text: string) => void;
 
@@ -102,7 +103,7 @@ FORMAT: ${lengthGuide}
 - Do NOT explain what you are doing. Just write the reply.
 - Output ONLY the reply text. Nothing else.`;
 
-  const userMessage = `Transcription of received voice messages:\n"${transcriptionText}"\n\nWrite the WhatsApp reply:`;
+  const userMessage = `/no_think\nTranscription of received voice messages:\n"${transcriptionText}"\n\nWrite the WhatsApp reply:`;
 
   const response = await _engine.chat.completions.create({
     messages: [
@@ -113,7 +114,9 @@ FORMAT: ${lengthGuide}
     max_tokens: replyLength === 'short' ? 100 : replyLength === 'medium' ? 220 : 400,
   });
 
-  const text = (response.choices[0]?.message?.content ?? '').trim();
+  const raw = (response.choices[0]?.message?.content ?? '').trim();
+  // Qwen3 may still emit <think>...</think> blocks even with /no_think — strip them
+  const text = raw.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
   if (!text) return templateFallback(transcriptionText, profileInstructions);
 
   return [{ id: crypto.randomUUID(), text, length: replyLength, tone: 'ai' }];
