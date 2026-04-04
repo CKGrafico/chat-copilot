@@ -16,6 +16,7 @@ export default function ProcessingProgressBar({
   value,
   label = 'Processing',
   indeterminate = false,
+  reduceMotion,
 }: ProcessingProgressBarProps) {
   // Ensure safe value between 0 and 1
   const clamped = Math.max(0, Math.min(1, Number(value) || 0));
