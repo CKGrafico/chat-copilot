@@ -60,22 +60,65 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const clearModelCache = async () => {
     try {
-      // Clear Service Worker cache
+      // 1. Clear Transformers.js cache (Whisper model)
+      //    Transformers.js stores model files under 'transformers-cache' in the Cache API
       if ('caches' in window) {
         const cacheNames = await caches.keys();
-        const modelCaches = cacheNames.filter((name) =>
-          name.includes('whisper') || name.includes('model')
+        await Promise.all(
+          cacheNames
+            .filter(name =>
+              name === 'transformers-cache' ||
+              name.includes('whisper') ||
+              name.includes('transformers') ||
+              name.includes('model')
+            )
+            .map(name => caches.delete(name))
         );
-        await Promise.all(modelCaches.map((name) => caches.delete(name)));
       }
 
-      // Clear IndexedDB model stores
-      const dbNames = await indexedDB.databases?.() || [];
-      for (const db of dbNames) {
-        if (db.name?.includes('whisper') || db.name?.includes('model')) {
-          indexedDB.deleteDatabase(db.name);
-        }
+      // 2. Clear WebLLM cache (LLM model)
+      //    WebLLM provides deleteModelAllInfoInCache() which cleanly removes
+      //    model weights, chat config, and WASM binaries from Cache API + IndexedDB
+      try {
+        const { deleteModelAllInfoInCache, prebuiltAppConfig } = await import('@mlc-ai/web-llm');
+        const modelIds = prebuiltAppConfig.model_list.map((m: { model_id: string }) => m.model_id);
+        await Promise.all(
+          modelIds.map((id: string) =>
+            deleteModelAllInfoInCache(id, prebuiltAppConfig).catch(() => {
+              // Ignore — model may not be cached
+            })
+          )
+        );
+      } catch {
+        // WebLLM not available in this build — skip silently
       }
+
+      // 3. Also wipe any IndexedDB DBs that look model-related (belt-and-suspenders)
+      const dbList = await indexedDB.databases?.() ?? [];
+      await Promise.all(
+        dbList
+          .filter(db => db.name && (
+            db.name.includes('whisper') ||
+            db.name.includes('model') ||
+            db.name.includes('mlc') ||
+            db.name.includes('webllm')
+          ))
+          .map(db => new Promise<void>((resolve) => {
+            const req = indexedDB.deleteDatabase(db.name!);
+            req.onsuccess = () => resolve();
+            req.onerror = () => resolve(); // resolve anyway
+          }))
+      );
+
+      // 4. Reset the in-memory singletons so next use re-loads fresh
+      try {
+        const { resetWhisperModelForTests } = await import('../../features/transcription/whisperService');
+        resetWhisperModelForTests();
+      } catch { /* not critical */ }
+      try {
+        const { resetLLMForTests } = await import('../../features/reply/llmService');
+        resetLLMForTests();
+      } catch { /* not critical */ }
 
       setError(null);
     } catch (err) {

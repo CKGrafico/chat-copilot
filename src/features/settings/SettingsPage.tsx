@@ -110,7 +110,8 @@ function CacheManagement() {
         <div className="settings-section-header">
           <h2>Model Cache</h2>
           <p className="settings-section-description">
-            Clear downloaded AI models from your device. They'll be re-downloaded on next use.
+            Clear downloaded AI models from your device (Whisper speech model + LLM reply model).
+            They'll be re-downloaded on next use.
           </p>
         </div>
 
