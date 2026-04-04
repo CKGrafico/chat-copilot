@@ -53,6 +53,7 @@
   align-items: center;
   justify-content: center;
   min-height: 44px;
+  min-width: 44px;
   padding: 8px 20px;
   background: var(--accent);
   color: #fff;
