@@ -9,9 +9,12 @@ import { getAllProfiles } from '../../profiles/profileStore';
 import { getStoredProfileId } from '../../reply/profileStorage';
 import { logger } from '../../../shared/utils/logger';
 import { sortFiles } from '../sortFiles';
+import { squadService } from '../../../shared/squad/squadService';
 import type { Profile } from '../../profiles/profile';
 import type { GenerateReplyOutput } from '../../../shared/squad/types';
 import './workflow.css';
+// whisperService is imported dynamically inside handleFiles because @xenova/transformers
+// is ~4MB — it should only be downloaded when the user actually uploads audio.
 
 type Reply = GenerateReplyOutput['replies'][number];
 
@@ -109,7 +112,6 @@ export function WorkflowScreen() {
     setReplyLoading(true);
     setReplyError(null);
     try {
-      const { squadService } = await import('../../../shared/squad/squadService');
       const result = await squadService.run('generateReply', {
         transcriptionText: context.transcriptionText ?? '',
         profileInstructions: selectedProfile?.instructions ?? '',

@@ -4,7 +4,13 @@
 //
 // M4 implements transcribeAudio (Whisper via Transformers.js Web Worker).
 // M6 implements generateReply (template engine Phase 1, Phase 2: LLM).
+//
+// NOTE: Only whisperService uses a dynamic import (lazy) because @xenova/transformers
+// is ~4MB and should only be downloaded when the user actually uploads audio.
+// All other imports are static so the app bundles cleanly for GitHub Pages / static hosting.
 
+import { transcribeCapability } from './transcriptionCapability';
+import { generateReplies } from '../../features/reply/templateEngine';
 import type { CapabilityMap, CapabilityName } from './types';
 
 type CapabilityHandler<K extends CapabilityName> = (
@@ -13,15 +19,11 @@ type CapabilityHandler<K extends CapabilityName> = (
 
 const capabilities: { [K in CapabilityName]: CapabilityHandler<K> } = {
   transcribeAudio: async (input): Promise<CapabilityMap['transcribeAudio']['output']> => {
-    // Implemented in M4: forward to transcription capability (whisperService wrapper)
-    const { transcribeCapability } = await import('./transcriptionCapability');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return transcribeCapability(input as any);
   },
 
-
   generateReply: async (input): Promise<CapabilityMap['generateReply']['output']> => {
-    const { generateReplies } = await import('../../features/reply/templateEngine');
     // Combine instructions with language hint so future LLM can use it;
     // template engine reads style cues from the combined instructions string.
     const lang = input.profileLanguage ? `Language: ${input.profileLanguage}. ` : '';
