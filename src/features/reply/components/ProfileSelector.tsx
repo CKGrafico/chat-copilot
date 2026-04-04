@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import type { Profile } from '../types';
+import type { Profile } from '../../profiles/profile';
 import { setStoredProfileId } from '../profileStorage';
 import './reply.css';
 

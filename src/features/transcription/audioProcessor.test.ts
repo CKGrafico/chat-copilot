@@ -44,8 +44,8 @@ describe('audioProcessor.normalizeAudio', () => {
     const progress = vi.fn();
 
     const out1 = await normalizeAudio(input, progress);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _out2 = await normalizeAudio(input, progress);
+    // Call normalizeAudio again to verify it's cached (singleton pattern)
+    void await normalizeAudio(input, progress);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((ffmpegModule as any).createFFmpeg).toHaveBeenCalledTimes(1);

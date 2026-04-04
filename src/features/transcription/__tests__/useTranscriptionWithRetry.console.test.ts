@@ -1,6 +1,6 @@
 import { vi, describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react-hooks';
-import * as squad from '../../shared/squad/squadService';
+import * as squad from '../../../shared/squad/squadService';
 import { useTranscriptionWithRetry } from '../useTranscriptionWithRetry';
 
 vi.mock('../../shared/squad/squadService');

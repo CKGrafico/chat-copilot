@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './TranscriptionErrorBanner.module.css';
 
 export interface TranscriptionErrorBannerProps {

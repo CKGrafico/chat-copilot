@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import type { Profile } from '../types';
+import type { Profile } from '../../profiles/profile';
 import { getAllProfiles } from '../../profiles/profileStore';
-import { ProfileSelector, getStoredProfileId } from './ProfileSelector';
+import { ProfileSelector } from './ProfileSelector';
+import { getStoredProfileId } from '../profileStorage';
 import { ReplyCandidates } from './ReplyCandidates';
 import { useReplyGeneration } from '../hooks/useReplyGeneration';
 import './reply.css';

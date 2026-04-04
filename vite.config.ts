@@ -10,4 +10,5 @@ export default defineConfig({
     globals: true,
     include: ['src/**/*.test.ts'],
   },
-})
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+} as any)

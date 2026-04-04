@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react-hooks';
-import * as squad from '../../shared/squad/squadService';
+import * as squad from '../../../shared/squad/squadService';
 import { useTranscriptionWithRetry } from '../useTranscriptionWithRetry';
 
 vi.mock('../../shared/squad/squadService');
@@ -35,7 +35,7 @@ describe('useTranscriptionWithRetry', () => {
 
       // advance timers to allow retry delay
       vi.advanceTimersByTime(1000);
-      const res = await promise;
+      const res = (await promise) as { text: string };
       expect(res.text).toBe('ok');
 
       // after success loading becomes false

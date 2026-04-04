@@ -1,4 +1,3 @@
-import React from 'react';
 import ProcessingProgressBar from '../../../shared/components/ProcessingProgressBar';
 import styles from './TranscriptionProgress.module.css';
 

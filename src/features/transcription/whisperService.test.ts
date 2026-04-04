@@ -43,9 +43,12 @@ describe('whisperService', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedCb: any;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockPipeline.mockImplementation((_task: any, _model: any, opts: any) => {
-        capturedCb = opts.progress_callback;
-        return Promise.resolve(mockPipelineFn);
+      (mockPipeline as any).mockImplementation(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return Promise.resolve((opts: any) => {
+          capturedCb = opts.progress_callback;
+          return mockPipelineFn;
+        });
       });
 
       const onProgress = vi.fn();
@@ -59,19 +62,22 @@ describe('whisperService', () => {
     });
 
     it('resets _loading and throws a friendly error on failure', async () => {
-      mockPipeline.mockRejectedValue(new Error('Network error'));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (mockPipeline as any).mockRejectedValue(new Error('Network error'));
 
       await expect(loadWhisperModel()).rejects.toThrow('Failed to load Whisper model');
 
       // After failure, a new call should attempt again
-      mockPipeline.mockResolvedValue(mockPipelineFn);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (mockPipeline as any).mockResolvedValue(mockPipelineFn);
       await loadWhisperModel();
       expect(mockPipeline).toHaveBeenCalledTimes(2);
     });
 
     it('throws offline-friendly error when navigator.onLine is false', async () => {
       Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
-      mockPipeline.mockRejectedValue(new Error('fetch failed'));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (mockPipeline as any).mockRejectedValue(new Error('fetch failed'));
 
       await expect(loadWhisperModel()).rejects.toThrow('Device is offline');
     });
@@ -79,7 +85,8 @@ describe('whisperService', () => {
     it('concurrent calls share one in-flight Promise', async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let resolve: any;
-      mockPipeline.mockReturnValue(new Promise(r => { resolve = r; }));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (mockPipeline as any).mockReturnValue((new Promise((r: any) => { resolve = r; })));
 
       const p1 = loadWhisperModel();
       const p2 = loadWhisperModel();

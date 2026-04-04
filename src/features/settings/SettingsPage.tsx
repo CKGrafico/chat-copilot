@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useSettings, WhisperModel } from '../../shared/contexts/SettingsContext';
+import { useSettings } from '../../shared/contexts/useSettings';
+import type { WhisperModel } from '../../shared/contexts/settings';
 import './settings.css';
 
 const MODEL_SIZES: Record<WhisperModel, string> = {

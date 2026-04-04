@@ -1,5 +1,16 @@
 // Audio preprocessing utilities for transcription
-let ffmpegInstance: unknown = null;
+interface FFmpegInstance {
+  load: () => Promise<void>;
+  setProgress?: (callback: (event: {ratio: number}) => void) => void;
+  setLogger?: (callback: (log: Record<string, unknown>) => void) => void;
+  FS?: {
+    writeFile: (path: string, data: Uint8Array) => void;
+    readFile: (path: string) => Uint8Array;
+  } | ((method: string, path: string, data?: Uint8Array) => Uint8Array | void);
+  run: (...args: string[]) => Promise<void>;
+}
+
+let ffmpegInstance: FFmpegInstance | null = null;
 let loadingPromise: Promise<void> | null = null;
 
 export function getFFmpegInstance() {
@@ -12,7 +23,7 @@ export async function normalizeAudio(file: File | ArrayBuffer, onProgress?: (p: 
     // Dynamically import to allow mocking in tests
     const ffmpegModule = await import('@ffmpeg/ffmpeg');
     const { createFFmpeg } = ffmpegModule;
-    ffmpegInstance = createFFmpeg({ log: true });
+    ffmpegInstance = createFFmpeg({ log: true }) as FFmpegInstance;
     // Provide progress reporting if available
     try {
       // Start a fallback progress estimator while loading
@@ -27,18 +38,18 @@ export async function normalizeAudio(file: File | ArrayBuffer, onProgress?: (p: 
         }
       }, 200);
 
-      if (typeof ffmpegInstance.setProgress === 'function') {
-        ffmpegInstance.setProgress(({ ratio }: unknown) => {
+      if (ffmpegInstance && typeof ffmpegInstance.setProgress === 'function') {
+        ffmpegInstance.setProgress(({ ratio }: {ratio: number}) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           try { onProgress?.(ratio); } catch (_e) {
             // ignore
           }
         });
-      } else if (typeof ffmpegInstance.setLogger === 'function') {
-        ffmpegInstance.setLogger((log: unknown) => {
+      } else if (ffmpegInstance && typeof ffmpegInstance.setLogger === 'function') {
+        ffmpegInstance.setLogger((log: Record<string, unknown>) => {
           // Parse progress messages if available (best-effort)
           if (log && typeof log.message === 'string') {
-            const m = log.message.match(/time=(\d+:?\d+:?\d+\.\d+)/);
+            const m = (log.message as string).match(/time=(\d+:?\d+:?\d+\.\d+)/);
             if (m) {
               // can't compute ratio reliably here
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -50,9 +61,13 @@ export async function normalizeAudio(file: File | ArrayBuffer, onProgress?: (p: 
         });
       }
 
-      loadingPromise = ffmpegInstance.load();
+      if (ffmpegInstance) {
+        loadingPromise = ffmpegInstance.load();
+      }
       try {
-        await loadingPromise;
+        if (loadingPromise) {
+          await loadingPromise;
+        }
       } catch (err: unknown) {
         clearInterval(interval);
         throw new Error('Failed to load ffmpeg.wasm: ' + (err && typeof err === 'object' && 'message' in err ? String((err as Record<string, unknown>).message) : String(err)) + '. Ensure network access or use CI mocks.');
@@ -72,11 +87,15 @@ export async function normalizeAudio(file: File | ArrayBuffer, onProgress?: (p: 
     inputData = new Uint8Array(file as ArrayBuffer);
   }
 
+  if (!ffmpegInstance) {
+    throw new Error('ffmpeg instance not initialized');
+  }
+
   // Write to ffmpeg FS
-  if (ffmpegInstance.FS && typeof ffmpegInstance.FS.writeFile === 'function') {
-    ffmpegInstance.FS.writeFile('input', inputData);
+  if (ffmpegInstance.FS && typeof (ffmpegInstance.FS as { writeFile?: (path: string, data: Uint8Array) => void }).writeFile === 'function') {
+    (ffmpegInstance.FS as { writeFile: (path: string, data: Uint8Array) => void }).writeFile('input', inputData);
   } else if (typeof ffmpegInstance.FS === 'function') {
-    ffmpegInstance.FS('writeFile', 'input', inputData);
+    (ffmpegInstance.FS as (method: string, path: string, data: Uint8Array) => void)('writeFile', 'input', inputData);
   } else {
     throw new Error('ffmpeg FS API not available');
   }
@@ -94,10 +113,10 @@ export async function normalizeAudio(file: File | ArrayBuffer, onProgress?: (p: 
 
   // Read output
   let out: Uint8Array | null = null;
-  if (ffmpegInstance.FS && typeof ffmpegInstance.FS.readFile === 'function') {
-    out = ffmpegInstance.FS.readFile('output.wav');
+  if (ffmpegInstance.FS && typeof (ffmpegInstance.FS as { readFile?: (path: string) => Uint8Array }).readFile === 'function') {
+    out = (ffmpegInstance.FS as { readFile: (path: string) => Uint8Array }).readFile('output.wav');
   } else if (typeof ffmpegInstance.FS === 'function') {
-    out = ffmpegInstance.FS('readFile', 'output.wav');
+    out = (ffmpegInstance.FS as (method: string, path: string) => Uint8Array)('readFile', 'output.wav');
   }
 
   if (!out) throw new Error('No output from ffmpeg');
