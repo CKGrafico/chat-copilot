@@ -3,7 +3,7 @@
 // Phase 2 (stretch): LLM-powered replies via Squad AI capability abstraction.
 // See M6 issues for full implementation.
 
-import type { Transcription } from '../../types/transcription';
+import type { Transcription } from '../types';
 
 export type ReplyOption = {
   id: string;

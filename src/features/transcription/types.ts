@@ -1,2 +1,2 @@
-// Re-export shared types for backward compatibility within the transcription feature.
-export type { TranscriptionStatus, Transcription } from '../../shared/types/transcription';
+// Re-export types from local file
+export type { TranscriptionStatus, Transcription } from './transcription';

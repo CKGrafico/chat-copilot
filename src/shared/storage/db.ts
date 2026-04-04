@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie';
-import type { Profile } from '../types/profile';
+import type { Profile } from '../../features/profiles/profile';
 import type { AnalyticsEvent } from '../analytics/analytics';
 
 export class ChatCopilotDB extends Dexie {

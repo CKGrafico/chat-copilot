@@ -1,5 +1,4 @@
-// Profile is owned by src/shared/types — re-exported here for use within this feature.
-// ProfileTone is feature-local and used for tone-based UI controls.
-export type { Profile } from '../../shared/types/profile';
+// Profile type local to this feature
+export type { Profile } from './profile';
 
 export type ProfileTone = 'formal' | 'casual' | 'friendly' | 'professional';

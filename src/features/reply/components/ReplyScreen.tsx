@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import type { Profile } from '../../../types/profile';
+import type { Profile } from '../types';
 import { getAllProfiles } from '../../profiles/profileStore';
 import { ProfileSelector, getStoredProfileId } from './ProfileSelector';
 import { ReplyCandidates } from './ReplyCandidates';
