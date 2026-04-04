@@ -13,8 +13,8 @@ export type TranscriptionResult = {
 export type ProgressCallback = (percent: number) => void;
 
 // Singleton pipeline — loaded once and reused
-let _pipeline: any = null;
-let _loading: Promise<any> | null = null;
+let _pipeline: unknown = null;
+let _loading: Promise<unknown> | null = null;
 
 /**
  * Loads openai/whisper-tiny via Transformers.js.
@@ -23,7 +23,7 @@ let _loading: Promise<any> | null = null;
  *
  * @param onProgress - Optional callback called with 0-100 as files download
  */
-export async function loadWhisperModel(onProgress?: ProgressCallback): Promise<any> {
+export async function loadWhisperModel(onProgress?: ProgressCallback): Promise<unknown> {
   if (_pipeline) return _pipeline;
   if (_loading) return _loading;
 
@@ -35,19 +35,25 @@ export async function loadWhisperModel(onProgress?: ProgressCallback): Promise<a
         {
           progress_callback: (progress: { status: string; progress?: number }) => {
             if (progress.status === 'progress' && typeof progress.progress === 'number') {
-              try { onProgress?.(Math.round(progress.progress)); } catch (_) {}
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              try { onProgress?.(Math.round(progress.progress)); } catch (_e) {
+                // ignore
+              }
             } else if (progress.status === 'done') {
-              try { onProgress?.(100); } catch (_) {}
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              try { onProgress?.(100); } catch (_e) {
+                // ignore
+              }
             }
           },
         },
       );
       _pipeline = pipe;
       return _pipeline;
-    } catch (err: any) {
+    } catch (err: unknown) {
       _loading = null;
       const isOffline = !navigator.onLine;
-      const msg = err?.message ?? String(err);
+      const msg = (err && typeof err === 'object' && 'message' in err) ? String((err as Record<string, unknown>).message) : String(err);
       throw new Error(
         isOffline
           ? 'Device is offline. Whisper model files could not be downloaded. Connect to a network and try again.'
@@ -59,7 +65,7 @@ export async function loadWhisperModel(onProgress?: ProgressCallback): Promise<a
   return _loading;
 }
 
-export function getWhisperModel(): any {
+export function getWhisperModel(): unknown {
   return _pipeline;
 }
 
@@ -79,7 +85,8 @@ export async function transcribeAudio(audioBuffer: ArrayBuffer): Promise<Transcr
   // Convert ArrayBuffer → Float32Array (PCM samples expected by Transformers.js)
   const floatArray = new Float32Array(audioBuffer);
 
-  const result: any = await _pipeline(floatArray, { sampling_rate: 16000 });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const result: any = await (_pipeline as any)(floatArray, { sampling_rate: 16000 });
 
   return {
     text: result?.text ?? '',

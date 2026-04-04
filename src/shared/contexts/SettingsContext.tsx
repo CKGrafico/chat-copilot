@@ -1,6 +1,7 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, type ReactNode, useEffect, useState } from 'react';
 import { loadSettings, saveSettings } from '../utils/settingsStorage';
 import type { AppSettings, WhisperModel } from './settings';
+import { applyTheme } from './themeUtils';
 
 interface SettingsContextType {
   settings: AppSettings;
@@ -113,23 +114,5 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useSettings() {
-  const context = useContext(SettingsContext);
-  if (!context) {
-    throw new Error('useSettings must be used within SettingsProvider');
-  }
-  return context;
-}
-
-function applyTheme(theme: 'light' | 'dark') {
-  if (theme === 'dark') {
-    document.documentElement.classList.add('dark-theme');
-    document.documentElement.classList.remove('light-theme');
-  } else {
-    document.documentElement.classList.add('light-theme');
-    document.documentElement.classList.remove('dark-theme');
-  }
-}
-
-// Re-export types for backwards compatibility
 export type { AppSettings, WhisperModel };
+export { SettingsContext };

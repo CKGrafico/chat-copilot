@@ -7,6 +7,7 @@ vi.mock('../../shared/squad/squadService');
 
 describe('useTranscriptionWithRetry console logging', () => {
   it('logs internal errors via console.error during retries', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mockRun = (squad.squadService.run as any);
     mockRun.mockImplementation(async () => { throw new Error('fatal'); });
 

@@ -17,6 +17,7 @@ describe('useTranscriptionWithRetry', () => {
   });
 
   it('retries on failure and succeeds', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mockRun = (squad.squadService.run as any);
     let calls = 0;
     mockRun.mockImplementation(async () => {
@@ -46,6 +47,7 @@ describe('useTranscriptionWithRetry', () => {
   });
 
   it('fails after max attempts', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mockRun = (squad.squadService.run as any);
     mockRun.mockImplementation(async () => { throw new Error('fatal'); });
 

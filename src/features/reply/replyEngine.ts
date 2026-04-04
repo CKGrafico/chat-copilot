@@ -11,6 +11,7 @@ export type ReplyOption = {
   tone: 'formal' | 'casual' | 'friendly';
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function generateReplies(_transcription: Transcription): Promise<ReplyOption[]> {
   // TODO: select matching templates, inject profile context, return reply options
   throw new Error('Not implemented');

@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { Profile } from '../types';
+import { setStoredProfileId } from '../profileStorage';
 import './reply.css';
-
-const STORAGE_KEY = 'chat-copilot:selected-profile';
 
 type Props = {
   profiles: Profile[];
@@ -12,11 +11,7 @@ type Props = {
 
 export function ProfileSelector({ profiles, selectedId, onSelect }: Props) {
   const handleSelect = (id: string) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, id);
-    } catch {
-      // localStorage may be unavailable (private browsing, etc.)
-    }
+    setStoredProfileId(id);
     onSelect(id);
   };
 
@@ -72,10 +67,3 @@ export function ProfileSelector({ profiles, selectedId, onSelect }: Props) {
   );
 }
 
-export function getStoredProfileId(): string | null {
-  try {
-    return localStorage.getItem(STORAGE_KEY);
-  } catch {
-    return null;
-  }
-}

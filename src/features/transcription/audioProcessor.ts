@@ -1,5 +1,5 @@
 // Audio preprocessing utilities for transcription
-let ffmpegInstance: any = null;
+let ffmpegInstance: unknown = null;
 let loadingPromise: Promise<void> | null = null;
 
 export function getFFmpegInstance() {
@@ -21,23 +21,30 @@ export async function normalizeAudio(file: File | ArrayBuffer, onProgress?: (p: 
         fallback = Math.min(0.9, fallback + 0.05);
         try {
           onProgress?.(fallback);
-        } catch (e) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (_e) {
           // ignore
         }
       }, 200);
 
       if (typeof ffmpegInstance.setProgress === 'function') {
-        ffmpegInstance.setProgress(({ ratio }: any) => {
-          try { onProgress?.(ratio); } catch (e) {}
+        ffmpegInstance.setProgress(({ ratio }: unknown) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          try { onProgress?.(ratio); } catch (_e) {
+            // ignore
+          }
         });
       } else if (typeof ffmpegInstance.setLogger === 'function') {
-        ffmpegInstance.setLogger((log: any) => {
+        ffmpegInstance.setLogger((log: unknown) => {
           // Parse progress messages if available (best-effort)
           if (log && typeof log.message === 'string') {
             const m = log.message.match(/time=(\d+:?\d+:?\d+\.\d+)/);
             if (m) {
               // can't compute ratio reliably here
-              try { onProgress?.(0.5); } catch (e) {}
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              try { onProgress?.(0.5); } catch (_e) {
+                // ignore
+              }
             }
           }
         });
@@ -46,9 +53,9 @@ export async function normalizeAudio(file: File | ArrayBuffer, onProgress?: (p: 
       loadingPromise = ffmpegInstance.load();
       try {
         await loadingPromise;
-      } catch (err: any) {
+      } catch (err: unknown) {
         clearInterval(interval);
-        throw new Error('Failed to load ffmpeg.wasm: ' + (err && err.message ? err.message : String(err)) + '. Ensure network access or use CI mocks.');
+        throw new Error('Failed to load ffmpeg.wasm: ' + (err && typeof err === 'object' && 'message' in err ? String((err as Record<string, unknown>).message) : String(err)) + '. Ensure network access or use CI mocks.');
       }
       clearInterval(interval);
       onProgress?.(1);
@@ -78,8 +85,8 @@ export async function normalizeAudio(file: File | ArrayBuffer, onProgress?: (p: 
   if (typeof ffmpegInstance.run === 'function') {
     try {
       await ffmpegInstance.run('-i', 'input', '-ac', '1', '-ar', '16000', '-f', 'wav', 'output.wav');
-    } catch (err: any) {
-      throw new Error('ffmpeg processing failed: ' + (err && err.message ? err.message : String(err)));
+    } catch (err: unknown) {
+      throw new Error('ffmpeg processing failed: ' + (err && typeof err === 'object' && 'message' in err ? String((err as Record<string, unknown>).message) : String(err)));
     }
   } else {
     throw new Error('ffmpeg run API not available');
@@ -107,11 +114,11 @@ export async function chunkAudio(audioBufferOrArrayBuffer: ArrayBuffer, chunkDur
   if (overlap < 0) throw new Error('overlap must be >= 0');
   if (overlap >= chunkDuration) throw new Error('overlap must be smaller than chunkDuration');
 
-  const AudioCtx: any = (globalThis as any).AudioContext || (globalThis as any).webkitAudioContext;
+  const AudioCtx = ((globalThis as unknown) as Record<string, unknown>).AudioContext || ((globalThis as unknown) as Record<string, unknown>).webkitAudioContext;
   if (!AudioCtx) throw new Error('AudioContext not available in this environment. Tests should mock decodeAudioData.');
 
-  const ctx = new AudioCtx();
-  const decoded: any = await ctx.decodeAudioData(audioBufferOrArrayBuffer);
+  const ctx = new (AudioCtx as new () => AudioContext)();
+  const decoded = await ctx.decodeAudioData(audioBufferOrArrayBuffer) as AudioBuffer;
   const sampleRate: number = decoded.sampleRate;
   const numChannels: number = decoded.numberOfChannels || 1;
   const totalSamples: number = decoded.length;

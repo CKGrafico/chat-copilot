@@ -3,12 +3,14 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 vi.mock('@ffmpeg/ffmpeg', () => {
   const createFFmpegMock = vi.fn(() => {
     const files = new Map<string, Uint8Array>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const instance: any = {
       load: vi.fn(async () => { /* simulate load */ }),
       FS: {
         writeFile: (name: string, data: Uint8Array) => files.set(name, data instanceof Uint8Array ? data : new Uint8Array(data)),
         readFile: (name: string) => files.get(name),
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       run: vi.fn(async (...args: any[]) => {
         instance.lastRunArgs = args;
         // create a minimal WAV-like buffer starting with 'RIFF'
@@ -18,7 +20,9 @@ vi.mock('@ffmpeg/ffmpeg', () => {
         wav.set(riff, 0);
         files.set('output.wav', wav);
       }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setProgress: (cb: any) => { instance._progressCb = cb; },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setLogger: (cb: any) => { instance._logger = cb; }
     };
     return instance;
@@ -40,8 +44,10 @@ describe('audioProcessor.normalizeAudio', () => {
     const progress = vi.fn();
 
     const out1 = await normalizeAudio(input, progress);
-    const out2 = await normalizeAudio(input, progress);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _out2 = await normalizeAudio(input, progress);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((ffmpegModule as any).createFFmpeg).toHaveBeenCalledTimes(1);
     // returned buffer starts with 'RIFF'
     const dv = new Uint8Array(out1);
@@ -49,6 +55,7 @@ describe('audioProcessor.normalizeAudio', () => {
     expect(header).toBe('RIFF');
 
     // Ensure ffmpeg was called with mono 16k params
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const instance = (ffmpegModule as any).createFFmpeg.mock.results[0].value;
     expect(instance.lastRunArgs).toContain('-ac');
     expect(instance.lastRunArgs).toContain('1');

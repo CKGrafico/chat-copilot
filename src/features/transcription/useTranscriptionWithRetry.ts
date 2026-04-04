@@ -25,7 +25,7 @@ export function useTranscriptionWithRetry() {
         const res = await squadService.run('transcribeAudio', { audioBuffer });
         setState({ loading: false, attempts, result: res, error: null });
         return res;
-      } catch (err: any) {
+      } catch (err: unknown) {
         const isOffline = !navigator.onLine;
         // Keep a friendly user message while logging the raw error for debugging
         const userMsg = isOffline
@@ -33,7 +33,10 @@ export function useTranscriptionWithRetry() {
           : 'Transcription failed. We attempted to retry automatically.';
 
         // Log the internal error for debugging (local console/storage)
-        try { console.error('transcribeAudio error:', err); } catch (_) {}
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        try { console.error('transcribeAudio error:', err); } catch (_e) {
+          // ignore
+        }
 
         // Keep loading true while retrying; update attempts and a friendly error message for the UI
         setState({ loading: true, attempts, result: null, error: userMsg });

@@ -13,6 +13,7 @@ describe('squadService transcribeAudio', () => {
 
   it('delegates to whisperService.transcribeAudio and returns combined text', async () => {
     const mockResult = { text: 'Hello world', language: 'en', duration: 3.0 };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (whisper.transcribeAudio as any).mockResolvedValue(mockResult);
 
     const res = await squadService.run('transcribeAudio', { audioBuffer: new ArrayBuffer(8) });
@@ -33,6 +34,7 @@ describe('squadService generateReply', () => {
       { id: 'id-2', text: 'Medium reply here.', length: 'medium' as const, tone: 'friendly' },
       { id: 'id-3', text: 'Long reply goes here.', length: 'long' as const, tone: 'friendly' },
     ];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (templateEngine.generateReplies as any).mockReturnValue(mockCandidates);
 
     const res = await squadService.run('generateReply', {
@@ -56,6 +58,7 @@ describe('squadService generateReply', () => {
       { id: 'b', text: 'Reply B', length: 'medium' as const, tone: 'formal' },
       { id: 'c', text: 'Reply C', length: 'long' as const, tone: 'formal' },
     ];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (templateEngine.generateReplies as any).mockReturnValue(mockCandidates);
 
     await squadService.run('generateReply', {

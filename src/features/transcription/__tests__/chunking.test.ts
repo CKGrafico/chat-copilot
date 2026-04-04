@@ -13,17 +13,22 @@ function makeFakeAudioBuffer(sampleRate: number, durationSec: number) {
     sampleRate,
     length,
     numberOfChannels: 1,
-    getChannelData: (n: number) => channelData,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    getChannelData: (_n: number) => channelData,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
 
 describe('chunkAudio', () => {
   beforeEach(() => {
     // mock AudioContext
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).AudioContext = class {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       async decodeAudioData(_ab: ArrayBuffer) {
         return makeFakeAudioBuffer(16000, 180);
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   });
 

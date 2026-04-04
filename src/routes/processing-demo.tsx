@@ -27,7 +27,7 @@ export default function ProcessingDemo() {
         <h2>Indeterminate</h2>
         <ProcessingProgressBar value={0} indeterminate label="Processing results" />
         <p style={{ marginTop: 8 }}>
-          Resize the viewport to mobile width (<600px) to see larger touch targets and responsive
+          Resize the viewport to mobile width (&lt;600px) to see larger touch targets and responsive
           sizing.
         </p>
       </section>

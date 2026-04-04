@@ -15,6 +15,7 @@ const capabilities: { [K in CapabilityName]: CapabilityHandler<K> } = {
   transcribeAudio: async (input): Promise<CapabilityMap['transcribeAudio']['output']> => {
     // Implemented in M4: forward to transcription capability (whisperService wrapper)
     const { transcribeCapability } = await import('./transcriptionCapability');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return transcribeCapability(input as any);
   },
 

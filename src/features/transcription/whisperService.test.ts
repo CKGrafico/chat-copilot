@@ -40,7 +40,9 @@ describe('whisperService', () => {
     });
 
     it('calls onProgress with values from progress_callback', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedCb: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       mockPipeline.mockImplementation((_task: any, _model: any, opts: any) => {
         capturedCb = opts.progress_callback;
         return Promise.resolve(mockPipelineFn);
@@ -75,6 +77,7 @@ describe('whisperService', () => {
     });
 
     it('concurrent calls share one in-flight Promise', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let resolve: any;
       mockPipeline.mockReturnValue(new Promise(r => { resolve = r; }));
 

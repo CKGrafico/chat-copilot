@@ -10,6 +10,7 @@ export type AudioChunk = {
   endMs: number;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function processAudio(_file: File): Promise<AudioChunk[]> {
   // TODO: decode with ffmpeg.wasm, resample to 16kHz mono, split into chunks
   throw new Error('Not implemented');

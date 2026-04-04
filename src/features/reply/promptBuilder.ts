@@ -10,6 +10,7 @@ export type PromptContext = {
   profileTone?: string;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function buildPrompt(_ctx: PromptContext): string {
   // TODO: merge transcription + profile into a prompt string or template key
   throw new Error('Not implemented');
