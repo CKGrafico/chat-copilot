@@ -4,6 +4,7 @@ import { squadService } from '../../../shared/squad/squadService';
 import type { GenerateReplyOutput } from '../../../shared/squad/types';
 import { useAppState } from '../../../shared/state/useAppState';
 import { logger } from '../../../shared/utils/logger';
+import { clearSharedFiles, getSharedFiles } from '../../../shared/utils/sharedFilesStore';
 import type { Profile } from '../../profiles/profile';
 import { getAllProfiles } from '../../profiles/profileStore';
 import { ProfileSelector } from '../../reply/components/ProfileSelector';
@@ -14,9 +15,6 @@ import { FileUploadZone } from '../../share/FileUploadZone';
 import { sortFiles } from '../sortFiles';
 import { StepIndicator } from './StepIndicator';
 import './workflow.css';
-// whisperService is imported dynamically inside handleFiles because @xenova/transformers
-// is ~4MB — it should only be downloaded when the user actually uploads audio.
-// WebLLM (~1.9GB) is loaded lazily when the user clicks "Generate Replies".
 
 type Reply = GenerateReplyOutput['replies'][number];
 
@@ -181,6 +179,38 @@ export function WorkflowScreen() {
     setTimeout(() => setCopied(false), 2500);
   }, [context.transcriptionText, selectedProfile]);
 
+  // Android Web Share Target: SW stores shared files in IndexedDB and redirects to ?shared=1
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('shared') !== '1') return;
+    window.history.replaceState({}, '', window.location.pathname);
+    getSharedFiles()
+      .then(files => {
+        if (files.length > 0) {
+          void clearSharedFiles();
+          void handleFiles(files);
+        }
+      })
+      .catch(err => logger.warn('Workflow', 'Failed to read shared files', err));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // iOS clipboard paste: listen for paste events containing audio data
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const items = Array.from(e.clipboardData?.items ?? []);
+      const audioItems = items.filter(item => item.kind === 'file' && item.type.startsWith('audio/'));
+      if (audioItems.length === 0) return;
+      const files = audioItems.map(item => item.getAsFile()).filter((f): f is File => f !== null);
+      if (files.length > 0) {
+        e.preventDefault();
+        void handleFiles(files);
+      }
+    };
+    document.addEventListener('paste', onPaste);
+    return () => document.removeEventListener('paste', onPaste);
+  }, [handleFiles]);
+
   const toggleFile = (index: number) => {
     setExpandedFiles(prev => {
       const next = new Set(prev);
@@ -223,6 +253,11 @@ export function WorkflowScreen() {
             />
           </div>
           <FileUploadZone onFiles={files => { void handleFiles(files); }} acceptMultiple={true} />
+          <p className="workflow-screen__paste-hint">
+            📱 On iOS: Copy audio in WhatsApp, then <strong>long-press here → Paste</strong>
+            <br />
+            🤖 On Android: installed as app → Share directly from WhatsApp
+          </p>
         </>
       )}
 

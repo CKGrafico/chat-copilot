@@ -1,3 +1,6 @@
+const SW_PATH = import.meta.env.BASE_URL + 'sw.js';
+const SW_SCOPE = import.meta.env.BASE_URL;
+
 const swReadyCallbacks: Array<() => void> = [];
 let swIsReady = false;
 
@@ -24,14 +27,12 @@ export function registerServiceWorker(): void {
 
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/sw.js', { scope: '/' })
+      .register(SW_PATH, { scope: SW_SCOPE })
       .then((registration) => {
-        // If the SW is already active and controlling this page, fire immediately.
         if (navigator.serviceWorker.controller) {
           notifySWReady();
         }
 
-        // Watch for the SW becoming active via statechange on an installing/waiting worker.
         const trackWorker = (worker: ServiceWorker | null) => {
           if (!worker) return;
           worker.addEventListener('statechange', () => {
@@ -44,13 +45,11 @@ export function registerServiceWorker(): void {
           trackWorker(registration.installing);
         });
 
-        // Fallback: controllerchange fires when the SW takes control after skipWaiting.
         navigator.serviceWorker.addEventListener('controllerchange', () => {
           notifySWReady();
         });
       })
       .catch((err: unknown) => {
-        // Log lifecycle failure — not user data
         console.error('[SW] Registration failed', { error: err });
       });
   });
