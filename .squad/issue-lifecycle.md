@@ -222,23 +222,35 @@ Working as {member} ({role})
 - **Changes requested** → `changesRequested`
 - **CI failure** → `ciFailure`
 
+**Reviewer MUST post findings as inline GitHub PR comments** (not as chat text). Use `gh api` to submit a review with inline comments on the exact file+line:
+
+```powershell
+gh api repos/{owner}/{repo}/pulls/{PR_NUMBER}/reviews `
+  --method POST `
+  --field body="Overall verdict and summary" `
+  --field event="COMMENT" `
+  --field "comments[][path]=src/path/to/file.ts" `
+  --field "comments[][line]=42" `
+  --field "comments[][body]=🔴 BLOCKER: Description and required fix"
+```
+
+Comment severity prefixes:
+- 🔴 BLOCKER — must fix before merge
+- 🟡 WARNING — should fix, not blocking  
+- 🔵 MINOR — nice to have
+
 **When changes are requested:**
-1. Agent addresses feedback
-2. Commits fixes to the same branch
-3. Pushes updates
+1. Agent addresses feedback in a new commit on the same branch
+2. Pushes updates
+3. Posts reply comment confirming which findings were addressed
 4. Requests re-review
 
 **Update workflow:**
 ```bash
-# Make changes
 git add .
-git commit -m "fix: address review feedback"
+git commit -m "fix: address PR review feedback"
 git push
-```
-
-**Re-request review (GitHub):**
-```bash
-gh pr ready {pr-number}
+gh pr comment {pr-number} --body "All blockers addressed in latest commit."
 ```
 
 ### 6. PR Merge

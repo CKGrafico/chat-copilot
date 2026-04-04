@@ -186,7 +186,34 @@ User request based on real-world experience — autonomous agents committing too
 
 ---
 
-## 2026-04-01: RTK (Rust Token Killer) Setup — MERGED from decisions/inbox/Beats-rtk-setup.md
+## 2026-04-04: PR Review via GitHub Inline Comments (Mandatory)
+
+**By:** Quique (via Lead)  
+**What:** Reviewer must always post findings as inline GitHub PR review comments, not as chat output.  
+**Why:** Human-readable PR history, auditable findings tied to exact file+line, standard engineering practice.
+
+### Policy
+
+- **All PR reviews use `gh api` to post a single review with inline comments** on the exact file and line of each finding.
+- Comment severity: 🔴 BLOCKER / 🟡 WARNING / 🔵 MINOR.
+- Findings posted as chat text only are **not valid reviews**.
+- After blockers are fixed, agent posts a reply comment on the PR confirming resolution.
+- This applies to all agents doing PR review — Reviewer is primary, but Lead may also review architectural decisions inline.
+
+### Template
+
+```powershell
+gh api repos/{owner}/{repo}/pulls/{PR_NUMBER}/reviews `
+  --method POST `
+  --field body="Summary verdict" `
+  --field event="COMMENT" `
+  --field "comments[][path]=src/file.ts" `
+  --field "comments[][line]=42" `
+  --field "comments[][body]=🔴 BLOCKER: ..."
+```
+
+---
+— MERGED from decisions/inbox/Beats-rtk-setup.md
 
 **Date:** 2025-07-10  
 **Author:** Beats (Systems Dev)  

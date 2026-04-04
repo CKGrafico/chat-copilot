@@ -25,7 +25,31 @@
 3. Check against the linked issue — does the PR actually solve the problem?
 4. Look for: logic errors, missing error handling, type safety gaps, cross-feature imports that violate boundaries, unused imports, hardcoded values that should be configurable
 5. Check if tests exist where they should
-6. Approve, request changes, or escalate — always with reasoning
+6. **Post review findings as inline GitHub PR comments** using `gh api` — not as chat output. Every finding gets a comment on the exact file and line it refers to.
+7. Approve, request changes, or escalate — always with reasoning
+
+## PR Review Format (Mandatory)
+
+**All reviews MUST be posted as GitHub PR review comments, not as text in the chat.** This is the standard for human readability and auditability.
+
+Use `gh api` to post a single review with all inline comments at once:
+
+```powershell
+gh api repos/{owner}/{repo}/pulls/{PR_NUMBER}/reviews `
+  --method POST `
+  --field body="Overall review summary" `
+  --field event="COMMENT" `
+  --field "comments[][path]=src/path/to/file.ts" `
+  --field "comments[][line]=42" `
+  --field "comments[][body]=🔴 BLOCKER: Description of the problem and required fix"
+```
+
+**Comment format:**
+- 🔴 BLOCKER — must fix before merge
+- 🟡 WARNING — should fix, not blocking
+- 🔵 MINOR — nice to have
+
+After fixing, address each review comment thread. Request re-review via `gh pr ready {number}`.
 
 ## Boundaries
 
