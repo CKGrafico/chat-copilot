@@ -15,35 +15,216 @@ This project demonstrates how to use **Squad** (an AI team framework) with **Git
 
 Every step is tracked in GitHub. Every decision is documented. Every review is auditable.
 
-## The Squad Team
+## The 9-Person Squad (Detailed)
 
-| Agent | Role | Owns |
-|-------|------|------|
-| **Lead** | Architect | Architecture decisions, triage, review escalation |
-| **Artist** | Frontend Dev | React components, CSS, routing, UX |
-| **Asimov** | AI Pipeline Dev | Transformers.js, Squad capabilities, inference |
-| **Beats** | Systems Dev | Audio processing, ffmpeg.wasm, service worker |
-| **Vault** | Storage & Config | IndexedDB, Dexie, PWA manifest, caching |
-| **Planner** | Issue Writer | Backlog decomposition, acceptance criteria |
-| **Reviewer** | PR Reviewer | Code review via inline GitHub PR comments |
-| **Scribe** | Session Logger | Decision merging, cross-agent memory |
-| **Watcher** | Work Monitor | Issue triage, stale detection, label sync |
+### Lead (Architect)
+**Owns:** Architecture decisions, priority triage, escalation
 
-Team roster: [`.squad/team.md`](.squad/team.md)
-Routing rules: [`.squad/routing.md`](.squad/routing.md)
-Team decisions: [`.squad/decisions.md`](.squad/decisions.md)
+When deciding "IndexedDB vs localStorage," Lead says "IndexedDB—we need async storage for large datasets." Decision goes into `decisions.md`. Team follows it forever. Lead makes yes/no on design trade-offs. Breaks ties. Approves high-risk changes.
 
-## Key Guardrails
+### Artist (Frontend Developer)
+**Owns:** React, CSS, PWA shell, UI routing, accessibility
 
-- **No autonomous commits to main.** Agents work on feature branches. Merges require explicit approval.
-- **Inline PR reviews are mandatory.** Reviewer posts findings as GitHub review comments on the exact file and line, not as chat text. Severity: BLOCKER / WARNING / MINOR.
-- **No cross-feature imports.** Features communicate through `src/shared/` only.
-- **No human names in automation.** Agents use role names only (`lead`, `artist`, `reviewer`).
-- **AI capabilities route through Squad service.** UI never imports AI modules directly.
+When adding profiles screen, Artist creates feature folders (`src/features/profiles/`), adds responsive CSS with 44px touch targets (mobile-first), and opens PR. Reviewer checks for accessibility. If aria-live is missing, Reviewer blocks merge.
 
-See [`.squad/decisions.md`](.squad/decisions.md) for the full list.
+### Asimov (AI Pipeline Developer)
+**Owns:** Transformers.js, Whisper model, Squad capability service
 
-## Project Structure
+Implements reply generation in `src/features/reply/templateEngine.ts` but wraps it in `src/shared/squad/squadService.ts` so UI never imports AI modules directly. When you swap templates for LLM later, you change one file. UI unchanged.
+
+### Beats (Systems/Audio Developer)
+**Owns:** ffmpeg.wasm, audio processing, service worker, COOP/COEP headers
+
+Handles 32kHz mono → 16kHz stereo conversion, audio chunking, progress reporting. Reviews performance, offline capability, CORS issues.
+
+### Vault (Storage/Infrastructure Developer)
+**Owns:** IndexedDB (Dexie), service worker caching, PWA manifest
+
+Creates Dexie schema v2 with `profiles` and `analytics` tables. Implements CRUD operations. Versions model cache (`models-v1` → `models-v2` when Whisper updates).
+
+### Planner (Issue Writer)
+**Owns:** Backlog decomposition, acceptance criteria, user stories
+
+User says "Add profiles." Planner breaks into 5 issues: IndexedDB schema, CRUD, ProfileList UI, ProfileForm, seed default profile. Each issue ≈ 1 PR of work.
+
+### Reviewer (PR Gatekeeper)
+**Owns:** Code correctness, architecture guardrails, accessibility, test coverage
+
+Posts findings as inline GitHub PR comments (exact file+line, severity: 🔴 BLOCKER / 🟡 WARNING / 🔵 MINOR). Blocks merge if tests fail, guardrails violated, or error handling missing.
+
+### Scribe (Session Logger)
+**Owns:** `decisions.md`, session logs, cross-agent memory
+
+Invisible. Runs in background. Merges all decision files into shared decisions file. Deduplicates overlapping decisions. Commits squad changes to git. No one sees this happen.
+
+### Watcher (Issue Monitor)
+**Owns:** Triage, auto-routing, stale detection, auto-merge
+
+Runs on schedule. Sees new issue → reads title/body → labels `squad:beats` → assigns to Beats. Later auto-merges when CI passes + Reviewer approves.
+
+**Links:** [Team Roster](.squad/team.md) | [Routing Rules](.squad/routing.md) | [Team Decisions](.squad/decisions.md)
+
+## 5 Core Rules (Guardrails)
+
+### Rule 1: No Autonomous Commits to Main
+Agents stage changes, show summary, **wait for explicit approval**.
+
+```powershell
+# Agent stages:
+git add .
+
+# Shows summary:
+"Staged 5 files for profiles milestone. Ready to commit?"
+
+# User approves:
+"commit"
+
+# Then agent pushes
+git push origin main
+```
+
+### Rule 2: No Cross-Feature Imports
+Features are isolated. All communication routes through `src/shared/`.
+
+```typescript
+// ❌ BLOCKED
+import { Transcription } from '../transcription/types'
+
+// ✅ ALLOWED
+import { Transcription } from '../../shared/types'
+```
+
+PR #39 violated this (reply importing from transcription). Reviewer blocked it. Asimov fixed using shared types layer. Precedent set forever.
+
+### Rule 3: Inline PR Reviews Only
+Reviewer posts findings as GitHub PR comments (exact line number), not chat text.
+
+```powershell
+gh api repos/CKGrafico/chat-copilot/pulls/55/reviews `
+  --method POST `
+  --field body="Ready pending fixes" `
+  --field event="COMMENT" `
+  --field "comments[][path]=src/features/profiles/ProfileList.tsx" `
+  --field "comments[][line]=42" `
+  --field "comments[][body]=🔴 BLOCKER: Missing error boundary"
+```
+
+GitHub shows inline comment. Artist sees exactly where to fix. No ambiguity.
+
+### Rule 4: No Human Names
+All automation uses agent role names only. Human names forbidden in commits, PRs, issues, comments.
+
+```bash
+# ❌ BLOCKED
+git commit -m "fix: Quique requested this change"
+
+# ✅ ALLOWED  
+git commit -m "fix: per user feedback, address reply generation"
+```
+
+CI script enforces: `.squad/tools/check-agent-names.ps1`
+
+### Rule 5: Rejection Lockout
+If Reviewer rejects your PR, you can't re-work it. Someone else fixes the blockers.
+
+```
+PR #42 by Artist → Reviewer: 2 BLOCKERS
+→ Artist LOCKED from re-working
+→ Asimov assigned to fix blockers
+→ Asimov commits to same PR
+→ Reviewer approves → Merged
+```
+
+Forces objectivity. No author bias.
+
+## Real Workflow Example: Adding Profiles
+
+### Step 1: Planner Breaks Down Work
+User: "I want to save user profiles."
+
+Planner creates 5 issues:
+- **#16:** IndexedDB schema (Vault, P0)
+- **#17:** Profile CRUD (Vault, P0)
+- **#18:** ProfileList UI (Artist, P1)
+- **#19:** ProfileForm validation (Artist, P1)
+- **#20:** Seed default profile (Vault, P0)
+
+Each issue has acceptance criteria, routing label, priority.
+
+### Step 2: Watcher Routes & Assigns
+Watcher sees issues → labels `squad:vault` and `squad:artist` → auto-assigns to agents.
+
+### Step 3: Vault Implements Storage (#16)
+```bash
+git checkout -b squad/16-profile-indexeddb-schema
+# Writes src/shared/storage/db.ts (Dexie schema v2)
+git commit -m "feat(storage): add profiles table (#16)"
+git push
+gh pr create --title "[M5] IndexedDB schema for profiles" \
+  --body "Closes #16" --head squad/16-profile-indexeddb-schema --base main
+```
+
+### Step 4: Reviewer Reviews PR
+Posts inline comments:
+- 🔴 "Missing error handling in `initDB()` — wrap in try/catch"
+- 🟡 "Add JSDoc for schema fields"
+- 🔵 "Consider index on profile.id"
+
+### Step 5: Vault Fixes Blockers
+```bash
+git commit -m "fix: add error handling to initDB (#16)"
+git push
+# Replies to Reviewer: "Blockers addressed in latest commit"
+```
+
+### Step 6: Reviewer Approves
+Re-reviews → Approves. Watcher auto-merges. Issue #16 closes automatically.
+
+### Step 7: Artist Builds UI (#18)
+Can now import `profileStore` (Vault finished #16). Creates ProfileList with pagination, search. Tests on mobile (44px touch targets, aria-live regions).
+
+### Step 8: Reviewer Checks Accessibility
+- 🔴 "Touch targets only 32px, need 44px"
+- 🔴 "Missing aria-live for loading"
+- 🟡 "Consider skeleton UI"
+
+Artist fixes → Reviewer approves → Merged.
+
+### Step 9: Scribe Logs
+Session complete. Scribe:
+- Merges all decision files
+- Logs: "M5 profiles: 5 issues, 5 PRs, all guardrails passed"
+- Commits squad changes
+- Disappears (invisible)
+
+### Step 10: Done
+User runs `pnpm dev`, navigates to `/profiles`, sees ProfileList with saved profiles. Data persists in IndexedDB.
+
+---
+
+## For Your Company (500 People)
+
+This repo shows you:
+
+1. **Clear Ownership** — No "who's responsible?" fights. Each agent owns a domain.
+2. **Async-Friendly** — Agents work in parallel. Decisions documented. No back-and-forth.
+3. **Auditable** — Every PR has inline comments tied to exact code lines. Every decision in git history.
+4. **Prevents Chaos** — Naming policy, guardrails, rejection lockout = no firefights over code.
+5. **Scalable** — Add more agents as you grow. Same rules. Same structure.
+
+### How to Use This as a Template
+
+1. Copy `.squad/` to your repo
+2. Update `.squad/team.md` with your team's agents and domains
+3. Update `.squad/routing.md` with your work-type routing
+4. Create `.squad/agents/{agent-name}/charter.md` for each agent
+5. Set `.squad/decisions.md` with your team's first decisions
+6. Enable GitHub Actions workflows (in `.github/workflows/`) for triage & auto-merge
+7. Train your AI agents on `.squad/copilot-instructions.md`
+
+Then pick an issue, and watch your AI team work.
+
+---
 
 ```
 src/
