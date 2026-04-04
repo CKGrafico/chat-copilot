@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import FileUploadZone from '../../FileUploadZone';
+import FileUploadZone from '../FileUploadZone';
 import { Link, useNavigate } from 'react-router-dom';
 import { useShareData } from '../hooks/useShareData';
 
