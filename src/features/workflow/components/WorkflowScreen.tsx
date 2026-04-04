@@ -317,14 +317,24 @@ export function WorkflowScreen() {
             </div>
           )}
 
-          {/* Combined / full transcription */}
-          <div>
-            <h2 className="workflow-screen__heading">
-              {fileTranscriptions.length > 1 ? 'Combined Transcription' : 'Transcription'}
-            </h2>
-            <div className="workflow-screen__transcription">
-              <p>{context.transcriptionText}</p>
-            </div>
+          {/* Combined / full transcription — accordion, closed by default */}
+          <div className="workflow-screen__file-item">
+            <button
+              className="workflow-screen__file-toggle"
+              onClick={() => toggleFile(-1)}
+              aria-expanded={expandedFiles.has(-1)}
+            >
+              <span className="workflow-screen__file-name" style={{ fontWeight: 600 }}>
+                {fileTranscriptions.length > 1 ? 'Combined Transcription' : 'Transcription'}
+              </span>
+              <span className="workflow-screen__file-preview">
+                {expandedFiles.has(-1) ? '' : (context.transcriptionText ?? '').substring(0, 60) + ((context.transcriptionText?.length ?? 0) > 60 ? '…' : '')}
+              </span>
+              <span className="workflow-screen__file-chevron">{expandedFiles.has(-1) ? '▲' : '▼'}</span>
+            </button>
+            {expandedFiles.has(-1) && (
+              <div className="workflow-screen__file-text">{context.transcriptionText}</div>
+            )}
           </div>
 
           {/* Profile + generate */}
@@ -346,7 +356,7 @@ export function WorkflowScreen() {
               onClick={() => { void handleGenerate(); }}
               disabled={replyLoading || !selectedProfileId}
             >
-              {replyLoading ? '⟳ ' + (replyLoadingLabel || 'Generating…') : '✓ Generate Replies'}
+              {replyLoading ? '⟳ ' + (replyLoadingLabel || 'Generating…') : '🤖 Generate Reply using local LLM (~1GB cache)'}
             </button>
           </div>
 
