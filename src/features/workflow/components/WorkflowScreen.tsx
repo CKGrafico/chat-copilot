@@ -14,6 +14,11 @@ import './workflow.css';
 
 type Reply = GenerateReplyOutput['replies'][number];
 
+type FileTranscription = {
+  fileName: string;
+  text: string;
+};
+
 export function WorkflowScreen() {
   const { state, context, send } = useAppState();
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -22,32 +27,25 @@ export function WorkflowScreen() {
   const [replyLoading, setReplyLoading] = useState(false);
   const [replyError, setReplyError] = useState<string | null>(null);
   const [modelProgress, setModelProgress] = useState(0);
+  const [fileTranscriptions, setFileTranscriptions] = useState<FileTranscription[]>([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
+  const [totalFiles, setTotalFiles] = useState(0);
+  const [expandedFiles, setExpandedFiles] = useState<Set<number>>(new Set());
 
   const handleFiles = useCallback(async (files: File[]) => {
     if (files.length === 0) return;
-    const file = files[0];
-    logger.info('Workflow', `File selected: ${file.name} (${file.size} bytes)`);
+    logger.info('Workflow', `${files.length} file(s) selected`);
 
-    send('START_UPLOAD', { audioFile: file });
+    setTotalFiles(files.length);
+    setCurrentFileIndex(0);
+    setFileTranscriptions([]);
+    setGeneratedReplies([]);
+    setReplyError(null);
+
+    send('START_UPLOAD', { audioFile: files[0] });
 
     try {
-      // Step 1 (uploading): normalize audio → 16kHz mono WAV
-      logger.debug('Workflow', 'Normalizing audio...');
-      let audioBuffer: ArrayBuffer;
-      try {
-        const { normalizeAudio } = await import('../../transcription/audioProcessor');
-        audioBuffer = await normalizeAudio(file, p => {
-          logger.debug('Workflow', `Audio normalization: ${Math.round(p * 100)}%`);
-        });
-        logger.info('Workflow', 'Audio normalization complete');
-      } catch (normErr) {
-        // ffmpeg not available — fall back to raw ArrayBuffer; Whisper handles most formats
-        logger.warn('Workflow', 'Audio normalization failed, falling back to raw file', normErr);
-        audioBuffer = await file.arrayBuffer();
-      }
-      send('UPLOAD_COMPLETE');
-
-      // Step 2 (processing): load the Whisper model
+      // Load Whisper model once upfront
       logger.info('Workflow', 'Loading Whisper model...');
       const { loadWhisperModel, transcribeAudio } = await import('../../transcription/whisperService');
       await loadWhisperModel(p => {
@@ -55,16 +53,37 @@ export function WorkflowScreen() {
         logger.debug('Workflow', `Model loading: ${p}%`);
       });
       logger.info('Workflow', 'Whisper model loaded');
+      send('UPLOAD_COMPLETE');
       send('PROCESSING_COMPLETE');
 
-      // Step 3 (transcribing): run Whisper on the audio
-      logger.info('Workflow', 'Transcribing audio...');
-      const result = await transcribeAudio(audioBuffer);
-      logger.info('Workflow', `Transcription complete: "${result.text}"`);
+      // Transcribe each file sequentially
+      const results: FileTranscription[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        setCurrentFileIndex(i + 1);
+        logger.info('Workflow', `Processing file ${i + 1}/${files.length}: ${file.name}`);
 
-      send('TRANSCRIPTION_COMPLETE', { transcriptionText: result.text });
+        let audioBuffer: ArrayBuffer;
+        try {
+          const { normalizeAudio } = await import('../../transcription/audioProcessor');
+          audioBuffer = await normalizeAudio(file);
+        } catch {
+          logger.warn('Workflow', `Normalization failed for ${file.name}, using raw buffer`);
+          audioBuffer = await file.arrayBuffer();
+        }
 
-      // Load profiles and move to done
+        const result = await transcribeAudio(audioBuffer);
+        logger.info('Workflow', `File ${i + 1} transcribed: "${result.text}"`);
+        results.push({ fileName: file.name, text: result.text.trim() });
+        setFileTranscriptions([...results]);
+      }
+
+      // Combine all transcriptions
+      const combined = results.map(r => r.text).filter(Boolean).join('\n\n');
+      logger.info('Workflow', `Combined transcription: "${combined}"`);
+
+      send('TRANSCRIPTION_COMPLETE', { transcriptionText: combined });
+
       const loaded = await getAllProfiles();
       setProfiles(loaded);
       if (!getStoredProfileId() && loaded.length > 0) {
@@ -99,10 +118,19 @@ export function WorkflowScreen() {
     }
   }, [context.transcriptionText, selectedProfileId, profiles]);
 
+  const toggleFile = (index: number) => {
+    setExpandedFiles(prev => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
+
   const stepLabels: Partial<Record<typeof state, string>> = {
-    uploading: 'Step 1 of 4: Receiving file',
+    uploading: 'Step 1 of 4: Loading AI model',
     processing: 'Step 2 of 4: Loading AI model',
-    transcribing: 'Step 3 of 4: Transcribing',
+    transcribing: `Step 3 of 4: Transcribing file ${currentFileIndex} of ${totalFiles}`,
     replying: 'Step 4 of 4: Almost done',
     done: 'Done',
   };
@@ -121,41 +149,80 @@ export function WorkflowScreen() {
       {state === 'idle' && (
         <>
           <h1 className="workflow-screen__heading">Upload Audio</h1>
-          <FileUploadZone onFiles={files => { void handleFiles(files); }} acceptMultiple={false} />
+          <p className="workflow-screen__progress-hint">
+            Share one or multiple audio files — they'll be transcribed and combined into a single reply.
+          </p>
+          <FileUploadZone onFiles={files => { void handleFiles(files); }} acceptMultiple={true} />
         </>
       )}
 
-      {state === 'uploading' && (
-        <div className="workflow-screen__progress-section">
-          <h2 className="workflow-screen__heading">Preparing audio…</h2>
-          <ProcessingProgressBar value={0} label="Preparing audio" indeterminate />
-        </div>
-      )}
-
-      {state === 'processing' && (
+      {(state === 'uploading' || state === 'processing') && (
         <div className="workflow-screen__progress-section">
           <h2 className="workflow-screen__heading">Loading AI model…</h2>
-          <p className="workflow-screen__progress-hint">First time takes a moment — model is cached after that.</p>
+          <p className="workflow-screen__progress-hint">First load takes a moment — cached after that.</p>
           <ProcessingProgressBar value={modelProgress / 100} label="Loading Whisper model" />
         </div>
       )}
 
       {(state === 'transcribing' || state === 'replying') && (
         <div className="workflow-screen__progress-section">
-          <h2 className="workflow-screen__heading">Transcribing audio…</h2>
-          <ProcessingProgressBar value={0} label="Transcribing audio" indeterminate />
+          <h2 className="workflow-screen__heading">
+            Transcribing {totalFiles > 1 ? `file ${currentFileIndex} of ${totalFiles}` : 'audio'}…
+          </h2>
+          <ProcessingProgressBar value={totalFiles > 1 ? (currentFileIndex - 1) / totalFiles : 0} label="Transcribing" indeterminate={totalFiles === 1} />
+          {fileTranscriptions.length > 0 && (
+            <div className="workflow-screen__partial-results">
+              {fileTranscriptions.map((ft, i) => (
+                <div key={i} className="workflow-screen__file-chip">
+                  <span className="workflow-screen__file-chip-name">✓ {ft.fileName}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {state === 'done' && (
         <>
-          <h2 className="workflow-screen__heading">Transcription</h2>
-          {context.transcriptionText && (
-            <div className="workflow-screen__transcription">
-              <p>{context.transcriptionText}</p>
+          {/* Individual file transcriptions (if multiple) */}
+          {fileTranscriptions.length > 1 && (
+            <div className="workflow-screen__files-section">
+              <h2 className="workflow-screen__heading">Individual Transcriptions</h2>
+              <div className="workflow-screen__file-list">
+                {fileTranscriptions.map((ft, i) => (
+                  <div key={i} className="workflow-screen__file-item">
+                    <button
+                      className="workflow-screen__file-toggle"
+                      onClick={() => toggleFile(i)}
+                      aria-expanded={expandedFiles.has(i)}
+                    >
+                      <span className="workflow-screen__file-index">{i + 1}</span>
+                      <span className="workflow-screen__file-name">{ft.fileName}</span>
+                      <span className="workflow-screen__file-preview">
+                        {expandedFiles.has(i) ? '' : ft.text.substring(0, 60) + (ft.text.length > 60 ? '…' : '')}
+                      </span>
+                      <span className="workflow-screen__file-chevron">{expandedFiles.has(i) ? '▲' : '▼'}</span>
+                    </button>
+                    {expandedFiles.has(i) && (
+                      <div className="workflow-screen__file-text">{ft.text}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
+          {/* Combined / full transcription */}
+          <div>
+            <h2 className="workflow-screen__heading">
+              {fileTranscriptions.length > 1 ? 'Combined Transcription' : 'Transcription'}
+            </h2>
+            <div className="workflow-screen__transcription">
+              <p>{context.transcriptionText}</p>
+            </div>
+          </div>
+
+          {/* Profile + generate */}
           <div className="workflow-screen__reply-controls">
             <ProfileSelector
               profiles={profiles}
@@ -166,7 +233,6 @@ export function WorkflowScreen() {
               className="btn btn-primary"
               onClick={() => { void handleGenerate(); }}
               disabled={replyLoading || !selectedProfileId}
-              aria-label="Generate reply suggestions"
             >
               {replyLoading ? '⟳ Generating...' : '✓ Generate Replies'}
             </button>
@@ -178,13 +244,11 @@ export function WorkflowScreen() {
             </div>
           )}
 
-          <ReplyCandidates replies={generatedReplies} loading={replyLoading} />
+          {generatedReplies.length > 0 && (
+            <ReplyCandidates replies={generatedReplies} loading={replyLoading} />
+          )}
 
-          <button
-            className="workflow-screen__retry-btn"
-            onClick={() => send('RESET')}
-            style={{ marginTop: '24px' }}
-          >
+          <button className="workflow-screen__retry-btn" onClick={() => send('RESET')} style={{ marginTop: '8px' }}>
             ↑ Upload another file
           </button>
         </>
